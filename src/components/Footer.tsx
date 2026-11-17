@@ -135,7 +135,7 @@ export const Footer = () => {
             {/* Engraved credential set */}
             <div className="flex flex-wrap justify-center gap-x-8 gap-y-6 max-w-full">
               {[
-                { eyebrow: "Accredited", line: "Fully Insured" },
+                { eyebrow: "Accredited", line: "Licensed and Insured" },
                 { eyebrow: "State Registered", line: "FL Licensed Contractor" },
                 { eyebrow: "Principal", line: "AJ Hoover · 30 Years in Construction" },
               ].map((c, i, arr) => (

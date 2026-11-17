@@ -385,7 +385,7 @@ const About = () => {
                   <div className="mt-8 flex items-center gap-4">
                     <div className="h-px w-10 bg-accent" />
                     <span className="font-sans text-[10px] md:text-xs tracking-[0.32em] uppercase text-muted-foreground">
-                      Background verified · 5+ years licensed · Fully insured · Board approved
+                      Background verified · 5+ years licensed · Licensed and Insured · Board approved
                     </span>
                   </div>
                 </div>

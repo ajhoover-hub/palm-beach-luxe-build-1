@@ -112,9 +112,6 @@ const Privacy = () => {
 
                   <div>
                     <h2 className="text-2xl font-display font-light mb-4">Analytics, Advertising and Cookies</h2>
-                    <p className="text-foreground font-medium tracking-wide mb-4">
-                      DRAFT — pending counsel and owner review
-                    </p>
                     <p className="text-muted-foreground font-light leading-relaxed mb-4">
                       The site may use Google Tag Manager and the Google Ads tag (gtag.js), which set cookies or similar technologies.
                     </p>

@@ -130,6 +130,12 @@ function assertFile(file, { must = [], mustNot = [], h1 = 1, types = [] }) {
     if (visible.includes("1994")) {
       throw new Error(`${file} still says 1994`);
     }
+    if (/fully insured/i.test(html)) {
+      throw new Error(`${file} still says Fully Insured`);
+    }
+    if (/\bDRAFT\b/.test(html)) {
+      throw new Error(`${file} still shows a DRAFT label`);
+    }
     if (/30 years of beau monde/i.test(visible)) {
       throw new Error(`${file} still says 30 years of Beau Monde`);
     }
