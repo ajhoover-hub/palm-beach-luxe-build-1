@@ -12,16 +12,14 @@ declare global {
 }
 
 /**
- * Public Google Ads IDs.
- * Lovable has no environment variables, so the live values can be hard-coded here.
- * Leave these empty to keep conversion tracking inert.
- * VITE_GADS_ID is the AW- account ID.
- * VITE_GADS_FORM_LABEL is the form-submit conversion label.
- * VITE_GADS_CALL_LABEL is the click-to-call conversion label.
+ * Public Google Ads IDs. Lovable has no environment variables, so these are
+ * hard-coded. GTM_ID_PUBLIC stays empty in src/lib/gtm.ts.
+ * GADS_FORM_LABEL_PUBLIC is action 7906689044, Palm Beach - Contact form submission.
+ * GADS_CALL_LABEL_PUBLIC is action 7906689578, Palm Beach - Click to call (website).
  */
-const GADS_ID_PUBLIC = "";
-const GADS_FORM_LABEL_PUBLIC = "";
-const GADS_CALL_LABEL_PUBLIC = "";
+const GADS_ID_PUBLIC = "AW-1000292937";
+const GADS_FORM_LABEL_PUBLIC = "Yl7DCJSAmrodEMmE_dwD";
+const GADS_CALL_LABEL_PUBLIC = "7dlICKqEmrodEMmE_dwD";
 
 const ADS_ID = import.meta.env.VITE_GADS_ID ?? GADS_ID_PUBLIC ?? "";
 const FORM_LABEL = import.meta.env.VITE_GADS_FORM_LABEL ?? GADS_FORM_LABEL_PUBLIC ?? "";
@@ -42,12 +40,21 @@ function gtag(...args: unknown[]): void {
   window.gtag(...args);
 }
 
+function isBrowser(): boolean {
+  return !import.meta.env.SSR && typeof window !== "undefined" && typeof document !== "undefined";
+}
+
 export function initGoogleAdsTag(): void {
-  if (tagLoaded || !ADS_ID || typeof document === "undefined") return;
+  if (!isBrowser() || tagLoaded || !ADS_ID) return;
+  const src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ADS_ID)}`;
+  if (document.querySelector(`script[src="${src}"]`)) {
+    tagLoaded = true;
+    return;
+  }
   tagLoaded = true;
   const script = document.createElement("script");
   script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ADS_ID)}`;
+  script.src = src;
   document.head.appendChild(script);
   gtag("js", new Date());
   gtag("config", ADS_ID);
@@ -59,7 +66,7 @@ function sendConversion(label: string | undefined, extra: Record<string, unknown
 }
 
 export function trackFormConversion(form: string): void {
-  if (typeof window === "undefined") return;
+  if (!isBrowser()) return;
   const key = `pb_conv_form_${form}`;
   try {
     if (window.sessionStorage.getItem(key)) return;
@@ -72,7 +79,7 @@ export function trackFormConversion(form: string): void {
 }
 
 export function installTelClickTracking(): void {
-  if (telListenerInstalled || typeof document === "undefined") return;
+  if (!isBrowser() || telListenerInstalled) return;
   telListenerInstalled = true;
   document.addEventListener(
     "click",

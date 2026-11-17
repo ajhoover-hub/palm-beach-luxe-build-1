@@ -23,9 +23,11 @@ import Sitemap from "./pages/Sitemap";
 import Unsubscribe from "./pages/Unsubscribe";
 import NotFound from "./pages/NotFound";
 
-initGTM();
-initGoogleAdsTag();
-installTelClickTracking();
+if (!import.meta.env.SSR) {
+  initGTM();
+  initGoogleAdsTag();
+  installTelClickTracking();
+}
 
 const queryClient = new QueryClient();
 

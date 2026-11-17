@@ -25,8 +25,9 @@ export function pushDataLayer(event: DataLayerEvent): void {
  * With the ID empty, nothing is injected and no container request is made.
  */
 export function initGTM(): void {
+  if (import.meta.env.SSR || typeof document === "undefined") return;
   const id = import.meta.env.VITE_GTM_ID ?? GTM_ID_PUBLIC ?? "";
-  if (!id || typeof document === "undefined") return;
+  if (!id) return;
 
   const src = `${GTM_SCRIPT_BASE}?id=${encodeURIComponent(id)}`;
   if (document.querySelector(`script[src="${src}"]`)) return;
