@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { RevealAnimation } from "@/components/RevealAnimation";
 import { SEO } from "@/components/SEO";
+import { formatInitials } from "@/components/AjName";
 import { IDS } from "@/lib/site";
 import { Award, Shield, Users, FileCheck } from "lucide-react";
 import ajImageAsset from "@/assets/aj-hoover-v3.png.asset.json";
@@ -103,7 +104,7 @@ const About = () => {
 
                 <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-primary leading-[1.1] mt-8 md:mt-10 max-w-xl">
                   <RevealAnimation animation="fade-up" delay={300}>
-                    <span className="block">Built by AJ Hoover.</span>
+                    <span className="block">Built by {formatInitials("AJ Hoover")}.</span>
                   </RevealAnimation>
                   <RevealAnimation animation="fade-up" delay={460}>
                     <span className="block italic text-muted-foreground">
@@ -116,7 +117,7 @@ const About = () => {
                   <div className="mt-10 flex items-center gap-4 text-[10px] md:text-xs tracking-[0.4em] uppercase text-muted-foreground/70 font-sans">
                     <span>Palm Beach</span>
                     <span className="h-px w-6 bg-accent/50" />
-                    <span>Est. by AJ Hoover</span>
+                    <span>Est. by {formatInitials("AJ Hoover")}</span>
                   </div>
                 </RevealAnimation>
               </div>
@@ -192,7 +193,7 @@ const About = () => {
                     </span>
                   </div>
                   <p className="font-display text-primary text-xl md:text-2xl leading-[1.55]">
-                    AJ moved to Florida and spent two decades curating the
+                    {formatInitials("AJ")} moved to Florida and spent two decades curating the
                     artisans, engineers, and trade partners now behind every
                     Beau Monde home — masons, millworkers, mechanical and
                     technology specialists who meet a standard most firms
@@ -225,7 +226,7 @@ const About = () => {
                     </span>
                   </div>
                   <p className="font-display text-primary text-xl md:text-2xl leading-[1.55]">
-                    With 30 years in the construction industry, AJ still walks every job and signs every
+                    With 30 years in the construction industry, {formatInitials("AJ")} still walks every job and signs every
                     standard — now backed by a technology stack that gives
                     owners full transparency into daily logs, CPM schedules,
                     and the selection process from dream board through
@@ -351,7 +352,7 @@ const About = () => {
                     <span className="italic text-muted-foreground">Master Builder.</span>
                   </h2>
                   <p className="font-sans font-light text-base md:text-lg text-muted-foreground leading-relaxed mb-10">
-                    AJ holds the Florida Certified Master Builder designation and is an
+                    {formatInitials("AJ")} holds the Florida Certified Master Builder designation and is an
                     NAHB Certified Master Building Professional —
                     elite voluntary credentials. He has 30 years in the
                     construction industry, impeccable ethics, and unbroken client trust.
@@ -373,7 +374,7 @@ const About = () => {
                         <Icon className="w-4 h-4 text-accent flex-shrink-0 mt-1" strokeWidth={1.25} />
                         <div>
                           <h4 className="font-sans text-[11px] tracking-[0.18em] uppercase text-primary mb-1">
-                            {k}
+                            {formatInitials(k)}
                           </h4>
                           <p className="font-sans font-light text-xs text-muted-foreground">{v}</p>
                         </div>
@@ -471,7 +472,7 @@ const About = () => {
                       <div className="flex items-center gap-3 mb-3">
                         <div className="h-px w-0 bg-accent transition-[width] duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] delay-[300ms] [.revealed_&]:w-8" />
                         <p className="text-[10px] tracking-[0.4em] uppercase text-accent font-sans">
-                          {member.role}
+                          {formatInitials(member.role)}
                         </p>
                       </div>
                       <h3 className="font-display text-2xl md:text-[28px] text-primary leading-tight mb-3">

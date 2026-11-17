@@ -7,6 +7,7 @@ import { RevealAnimation } from "@/components/RevealAnimation";
 import { SEO } from "@/components/SEO";
 import { DraftFaq } from "@/components/DraftFaq";
 import { HOME_FAQS, REVIEW_LINKS } from "@/lib/site";
+import { formatInitials } from "@/components/AjName";
 import { VideoHero } from "@/components/VideoHero";
 import { DeliveryShowcase } from "@/components/DeliveryShowcase";
 import { WalkthroughShowcase } from "@/components/WalkthroughShowcase";
@@ -135,7 +136,7 @@ const Home = () => {
               <RevealAnimation animation="fade-up" delay={240}>
                 <p className="font-sans font-light text-[15px] md:text-base leading-relaxed text-foreground/80 mb-7 max-w-lg">
                   An intracoastal estate completed this season — every threshold, joint, and finish
-                  shaped by AJ Hoover, with 30 years in the construction industry.
+                  shaped by {formatInitials("AJ Hoover")}, with 30 years in the construction industry.
                 </p>
                 <Link
                   to="/projects"
@@ -245,7 +246,7 @@ const Home = () => {
 
               <RevealAnimation animation="fade-up" delay={250}>
                 <p className="font-sans font-light text-base md:text-lg leading-relaxed max-w-lg mb-10 text-foreground/85">
-                  Where architectural excellence meets uncompromising craftsmanship. Led by AJ Hoover, with 30 years in the
+                  Where architectural excellence meets uncompromising craftsmanship. Led by {formatInitials("AJ Hoover")}, with 30 years in the
                   construction industry — custom residences for discerning Palm Beach clients.
                 </p>
               </RevealAnimation>
@@ -356,7 +357,7 @@ const Home = () => {
                     Years in Construction
                   </div>
                   <div className="mt-1 font-sans text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-foreground/70">
-                    AJ Hoover
+                    {formatInitials("AJ Hoover")}
                   </div>
                 </div>
               </RevealAnimation>
@@ -557,7 +558,7 @@ const Home = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 font-sans font-light text-[15px] leading-relaxed text-foreground/90">
                   <p>
-                    Beau Monde Builders was founded in 2015. It is led by AJ Hoover, with 30 years in the construction
+                    Beau Monde Builders was founded in 2015. It is led by {formatInitials("AJ Hoover")}, with 30 years in the construction
                     industry and a hands-on approach that prioritizes the artisanal over the industrial.
                   </p>
                   <p>
@@ -739,7 +740,7 @@ const Home = () => {
                     {row.k}
                   </span>
                   <span className="font-sans font-light text-[13px] text-primary/85 text-right">
-                    {row.v}
+                    {formatInitials(row.v)}
                   </span>
                 </div>
               </RevealAnimation>

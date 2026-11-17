@@ -42,7 +42,8 @@ const Email = ({ firstName, projectType, timeline, ownsLot, investmentRange }: P
           <Text style={value}>{projectType || '—'}</Text>
           {timeline ? <><Text style={label}>Timeline</Text><Text style={value}>{timeline}</Text></> : null}
           {ownsLot ? <><Text style={label}>Owns a lot</Text><Text style={value}>{ownsLot}</Text></> : null}
-          {investmentRange ? <><Text style={label}>Investment range</Text><Text style={value}>{investmentRange}</Text></> : null}
+          <Text style={label}>Investment range</Text>
+          <Text style={value}>{investmentRange?.trim() ? investmentRange : 'Not specified'}</Text>
         </Section>
         <Hr style={hr} />
         <Text style={signature}>Beau Monde Builders</Text>
@@ -63,7 +64,7 @@ export const template = {
     projectType: 'New custom home',
     timeline: '6-12 months',
     ownsLot: 'Looking',
-    investmentRange: '[RANGE 1 — TBD]',
+    investmentRange: '$5M–$10M',
   },
 } satisfies TemplateEntry
 

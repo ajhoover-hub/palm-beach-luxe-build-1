@@ -57,6 +57,9 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const fullName = `${firstName}${lastName ? " " + lastName : ""}`.trim();
+    const investmentDisplay = !isStyleBook
+      ? (investmentRange?.trim() ? investmentRange : "Not specified")
+      : "";
     console.log("Sending contact form email for:", fullName, email, "source:", source);
 
     // Send notification email to the team
@@ -84,7 +87,7 @@ const handler = async (req: Request): Promise<Response> => {
             ${projectType ? `<p style="margin: 10px 0; color: #555;"><strong>Project type:</strong> ${projectType}</p>` : ''}
             ${timeline ? `<p style="margin: 10px 0; color: #555;"><strong>Timeline:</strong> ${timeline}</p>` : ''}
             ${ownsLot ? `<p style="margin: 10px 0; color: #555;"><strong>Owns a lot:</strong> ${ownsLot}</p>` : ''}
-            ${investmentRange ? `<p style="margin: 10px 0; color: #555;"><strong>Investment range:</strong> ${investmentRange}</p>` : ''}
+            ${investmentDisplay ? `<p style="margin: 10px 0; color: #555;"><strong>Investment range:</strong> ${investmentDisplay}</p>` : ''}
           </div>
 
           ${message ? `<div style="background: #f9f9f9; padding: 30px;">
@@ -121,12 +124,12 @@ const handler = async (req: Request): Promise<Response> => {
           <p style="color: #555; line-height: 1.8; font-size: 16px;">
             Our team will review your inquiry and respond within one business day to schedule your private consultation.
           </p>
-          ${projectType || timeline || ownsLot || investmentRange ? `
+          ${!isStyleBook || projectType || timeline || ownsLot ? `
           <div style="background: #f9f9f9; padding: 24px 30px; margin-top: 8px;">
             ${projectType ? `<p style="margin: 8px 0; color: #555;"><strong>Project type:</strong> ${projectType}</p>` : ''}
             ${timeline ? `<p style="margin: 8px 0; color: #555;"><strong>Timeline:</strong> ${timeline}</p>` : ''}
             ${ownsLot ? `<p style="margin: 8px 0; color: #555;"><strong>Owns a lot:</strong> ${ownsLot}</p>` : ''}
-            ${investmentRange ? `<p style="margin: 8px 0; color: #555;"><strong>Investment range:</strong> ${investmentRange}</p>` : ''}
+            ${investmentDisplay ? `<p style="margin: 8px 0; color: #555;"><strong>Investment range:</strong> ${investmentDisplay}</p>` : ''}
           </div>` : ''}
           
           <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #eee;">

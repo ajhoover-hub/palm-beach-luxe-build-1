@@ -8,6 +8,7 @@ import { IDS, RENOVATION_FAQS } from "@/lib/site";
 import { RenovationsHero } from "@/components/RenovationsHero";
 import renovationMoment from "@/assets/projects/renovation-hero.jpg.asset.json";
 import fcmbLogo from "@/assets/fcmb-logo.png";
+import { formatInitials } from "@/components/AjName";
 import nahbBadge from "@/assets/nahb-certified-master-building-professional-badge.png";
 import renovationBefore from "@/assets/renovation-before.jpg.asset.json";
 import renovationAfter from "@/assets/renovation-after.jpg.asset.json";
@@ -195,7 +196,7 @@ const Renovations = () => {
                 </h1>
 
                 <p className="font-sans font-light text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mb-12">
-                  Led by AJ Hoover, with 30 years in the construction industry — now applied to the
+                  Led by {formatInitials("AJ Hoover")}, with 30 years in the construction industry — now applied to the
                   residences you already love. Every renovation is led personally, scheduled
                   around your life, and finished to the same standard as our ground-up estates.
                 </p>
@@ -333,7 +334,7 @@ const Renovations = () => {
                       {row.k}
                     </span>
                     <span className="font-sans font-light text-[13px] text-primary/85 text-right">
-                      {row.v}
+                      {formatInitials(row.v)}
                     </span>
                   </div>
                 </RevealAnimation>

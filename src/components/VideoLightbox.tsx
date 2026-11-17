@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X, Play, Maximize2 } from "lucide-react";
+import { formatInitials } from "@/components/AjName";
 
 export interface LightboxVideo {
   /** Source URL — iframe embed URL or direct .mp4 */
@@ -133,7 +134,7 @@ export const VideoLightbox = ({
         <div className="flex items-center gap-3 text-primary-foreground/80 shrink-0 max-w-[calc(100%-7rem)] text-center">
           <span className="h-px w-6 bg-accent" />
           <span className="font-sans text-[10px] md:text-xs tracking-[0.35em] uppercase">
-            Now Playing · {item.title}
+            Now Playing · {formatInitials(item.title)}
           </span>
           <span className="h-px w-6 bg-accent" />
         </div>
@@ -182,7 +183,7 @@ export const VideoLightbox = ({
           <div className="w-full max-w-2xl text-center shrink-0 flex flex-col items-center gap-2 md:gap-3 px-2">
             <span className="h-px w-10 bg-accent/60" />
             <p className="font-sans uppercase text-[10px] md:text-xs tracking-[0.35em] text-accent/90">
-              {item.title}
+              {formatInitials(item.title)}
             </p>
             <p className="font-display italic text-primary-foreground/85 text-base md:text-lg leading-snug">
               {item.subtitle}
@@ -238,7 +239,7 @@ export const VideoLightbox = ({
                         {active ? "Now Playing" : `Video ${String(i + 1).padStart(2, "0")}`}
                       </p>
                       <p className="font-display italic text-sm leading-tight text-primary-foreground truncate">
-                        {it.caption ?? it.title}
+                        {formatInitials(it.caption ?? it.title)}
                       </p>
                     </div>
                   </button>

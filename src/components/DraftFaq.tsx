@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import type { FaqItem } from "@/lib/site";
+import { formatInitials } from "@/components/AjName";
 
 type RelatedLink = { href: string; label: string };
 
@@ -35,7 +36,7 @@ export function DraftFaq({
                 {item.question}
               </dt>
               <dd className="mt-4 font-sans font-light text-base leading-relaxed text-foreground/80">
-                {item.answer}
+                {formatInitials(item.answer)}
               </dd>
             </div>
           ))}
@@ -45,7 +46,7 @@ export function DraftFaq({
             {related.map((link) => (
               <li key={link.href}>
                 <Link to={link.href} className="text-primary hover:text-accent transition-colors">
-                  {link.label}
+                  {formatInitials(link.label)}
                 </Link>
               </li>
             ))}

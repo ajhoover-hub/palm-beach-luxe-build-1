@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import fcmbLogo from "@/assets/fcmb-logo.png";
 import nahbBadge from "@/assets/nahb-certified-master-building-professional-badge.png";
 import { SERVICE_AREAS } from "@/lib/site";
+import { formatInitials } from "@/components/AjName";
 
 export const Footer = () => {
   return (
@@ -20,7 +21,7 @@ export const Footer = () => {
               </span>
             </div>
             <p className="text-sm font-light leading-relaxed max-w-sm text-primary-foreground/70">
-              Creating distinguished Palm Beach estates through architectural excellence and uncompromising craftsmanship. AJ Hoover · 30 years in construction.
+              Creating distinguished Palm Beach estates through architectural excellence and uncompromising craftsmanship. {formatInitials("AJ Hoover")} · 30 years in construction.
             </p>
           </div>
 
@@ -38,7 +39,7 @@ export const Footer = () => {
               ].map((item) => (
                 <li key={item.label}>
                   <Link to={item.path} className="hover:text-primary-foreground transition-colors">
-                    {item.label}
+                    {formatInitials(item.label)}
                   </Link>
                 </li>
               ))}
@@ -57,7 +58,7 @@ export const Footer = () => {
               ].map((item) => (
                 <li key={item.label}>
                   <Link to={item.path} className="hover:text-primary-foreground transition-colors">
-                    {item.label}
+                    {formatInitials(item.label)}
                   </Link>
                 </li>
               ))}
@@ -144,7 +145,7 @@ export const Footer = () => {
                       {c.eyebrow}
                     </span>
                     <span className="block max-w-[15rem] mx-auto text-xs uppercase tracking-[0.2em] leading-relaxed text-primary-foreground/85">
-                      {c.line}
+                      {formatInitials(c.line)}
                     </span>
                   </div>
                   {i < arr.length - 1 && (

@@ -11,12 +11,11 @@ import { z } from "zod";
 const PROJECT_TYPES = ["New custom home", "Renovation", "Addition"] as const;
 const TIMELINES = ["0-6 months", "6-12 months", "12+ months", "Just exploring"] as const;
 const LOT_OPTIONS = ["Yes", "No", "Looking"] as const;
-/** Placeholder brackets until the real investment ranges are chosen. */
 const INVESTMENT_RANGES = [
-  "[RANGE 1 — TBD]",
-  "[RANGE 2 — TBD]",
-  "[RANGE 3 — TBD]",
-  "[RANGE 4 — TBD]",
+  "$1M–$5M",
+  "$5M–$10M",
+  "$10M–$25M",
+  "$25M+",
 ] as const;
 
 const optionalListed = (options: readonly string[]) =>
@@ -178,7 +177,7 @@ const Contact = () => {
                   </div>
                   <div className="grid md:grid-cols-2 gap-10 md:gap-12">
                     <SelectUnderline id="ownsLot" label="Do you own a lot?" value={formData.ownsLot} onChange={handleInputChange} options={LOT_OPTIONS} placeholder="Select" />
-                    <SelectUnderline id="investmentRange" label="Investment Range" value={formData.investmentRange} onChange={handleInputChange} options={INVESTMENT_RANGES} placeholder="Select" />
+                    <SelectUnderline id="investmentRange" label="Investment Range" value={formData.investmentRange} onChange={handleInputChange} options={INVESTMENT_RANGES} placeholder="Select one…" />
                   </div>
                   <FieldUnderline id="message" label="Tell Us About Your Vision" value={formData.message} onChange={handleInputChange} required textarea placeholder="A few notes about your project, location, and timeline…" />
 

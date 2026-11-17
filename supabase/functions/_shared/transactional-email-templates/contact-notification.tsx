@@ -69,12 +69,8 @@ const Email = ({ fullName, email, phone, message, projectType, timeline, ownsLot
             </>
           ) : null}
 
-          {investmentRange ? (
-            <>
-              <Text style={label}>Investment range</Text>
-              <Text style={value}>{investmentRange}</Text>
-            </>
-          ) : null}
+          <Text style={label}>Investment range</Text>
+          <Text style={value}>{investmentRange?.trim() ? investmentRange : 'Not specified'}</Text>
         </Section>
 
         {message ? (
@@ -104,7 +100,7 @@ export const template = {
     projectType: 'New custom home',
     timeline: '6-12 months',
     ownsLot: 'Looking',
-    investmentRange: '[RANGE 1 — TBD]',
+    investmentRange: '$5M–$10M',
   },
 } satisfies TemplateEntry
 
