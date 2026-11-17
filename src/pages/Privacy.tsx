@@ -140,9 +140,6 @@ const Privacy = () => {
                         </a>
                       </li>
                     </ul>
-                    <p className="text-muted-foreground font-light leading-relaxed">
-                      [COUNSEL: confirm whether a cookie consent banner is required for target audiences]
-                    </p>
                   </div>
 
                   <div>
