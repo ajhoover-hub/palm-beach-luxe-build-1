@@ -8,7 +8,7 @@ import { IDS, RENOVATION_FAQS } from "@/lib/site";
 import { RenovationsHero } from "@/components/RenovationsHero";
 import renovationMoment from "@/assets/projects/renovation-hero.jpg.asset.json";
 import fcmbLogo from "@/assets/fcmb-logo.png";
-import nahbBadge from "@/assets/nahb-master-building-professional.png.asset.json";
+import nahbBadge from "@/assets/nahb-certified-master-building-professional-badge.png";
 import renovationBefore from "@/assets/renovation-before.jpg.asset.json";
 import renovationAfter from "@/assets/renovation-after.jpg.asset.json";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
@@ -302,9 +302,9 @@ const Renovations = () => {
                       <span aria-hidden className="absolute inset-0 translate-x-2 translate-y-2 border border-accent/25" />
                       <div className="relative bg-card border border-accent/25 p-5 shadow-[0_20px_40px_-18px_rgba(15,42,61,0.3)]">
                         <img
-                          src={nahbBadge.url}
+                          src={nahbBadge}
                           alt="NAHB Certified Master Building Professional"
-                          className="h-24 md:h-28 w-auto object-contain"
+                          className="h-16 w-auto object-contain"
                           loading="lazy"
                         />
                       </div>

@@ -15,7 +15,7 @@ import { InterviewShowcase } from "@/components/InterviewShowcase";
 import { MillionRenovationProjectCarousel } from "@/components/MillionRenovationProjectCarousel";
 import { BentoTile } from "@/components/BentoTile";
 import { Parallax } from "@/components/Parallax";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import fcmbLogo from "@/assets/fcmb-logo.png";
 import logoSketch from "@/assets/beau-monde-logo-sketch.jpeg";
 import logoSketchWebp from "@/assets/beau-monde-logo-sketch.webp";
@@ -23,7 +23,7 @@ import logoSketchAvif from "@/assets/beau-monde-logo-sketch.avif";
 import renovationHero from "@/assets/projects/renovation-hero.jpg.asset.json";
 import bespokePortrait from "@/assets/projects/bespoke-portrait.jpg.asset.json";
 import bespokeDetail from "@/assets/projects/bespoke-detail.jpg.asset.json";
-import nahbBadge from "@/assets/nahb-master-building-professional.png.asset.json";
+import nahbBadge from "@/assets/nahb-certified-master-building-professional-badge.png";
 // Carousel skips c10, so carousel position N>=10 maps to c(N+1).
 import featuredResidence from "@/assets/constellation/c55.jpg.asset.json"; // carousel #54
 import bento02 from "@/assets/constellation/c2.jpg.asset.json";              // carousel #2
@@ -290,28 +290,14 @@ const Home = () => {
               </RevealAnimation>
 
               <RevealAnimation animation="fade-up" delay={550}>
-                <div className="flex items-center gap-3">
-                  <div className="flex gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-accent fill-accent" strokeWidth={1.25} />
-                    ))}
-                  </div>
-                  <span className="font-sans text-[10px] uppercase tracking-widest text-foreground/60">
-                    50+ reviews across{" "}
-                    <a href={REVIEW_LINKS.googleRockledge.href} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
-                      {REVIEW_LINKS.googleRockledge.label}
-                    </a>
-                    {", "}
-                    <a href={REVIEW_LINKS.googlePalmBeach.href} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
-                      {REVIEW_LINKS.googlePalmBeach.label}
-                    </a>
-                    {", "}
-                    <a href={REVIEW_LINKS.houzz.href} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
-                      {REVIEW_LINKS.houzz.label}
-                    </a>
-                    {", Yelp and more"}
-                  </span>
-                </div>
+                <a
+                  href={REVIEW_LINKS.googleWriteReview.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-sans text-[10px] uppercase tracking-widest text-foreground/60 hover:text-accent transition-colors"
+                >
+                  {REVIEW_LINKS.googleWriteReview.label}
+                </a>
               </RevealAnimation>
             </div>
 
@@ -362,26 +348,26 @@ const Home = () => {
 
           {/* Band 2 — Stats */}
           <div className="py-12 md:py-14 border-b border-accent/30">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 divide-x divide-accent/20">
-              {[
-                { v: "30", l: "Years in Construction · AJ Hoover" },
-                { v: "Custom homes and estate renovations", l: "Palm Beach office", phrase: true },
-                { v: "CBC1260651", l: "Florida Certified Building Contractor", phrase: true },
-                { v: "100%", l: "Client Satisfaction" },
-              ].map((s, i) => (
-                <RevealAnimation key={s.l} animation="fade-up" delay={i * 120}>
-                  <div className="text-center px-4">
-                    <div className={s.phrase
-                      ? "font-display text-xl md:text-2xl font-light leading-tight mb-2"
-                      : "font-display text-4xl md:text-5xl font-light mb-1"}>
-                      {s.v}
-                    </div>
-                    <div className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-accent">
-                      {s.l}
-                    </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 sm:gap-0 sm:divide-x sm:divide-accent/20 max-w-3xl mx-auto">
+              <RevealAnimation animation="fade-up">
+                <div className="text-center px-4">
+                  <div className="font-display text-4xl md:text-5xl font-light mb-1">30</div>
+                  <div className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-accent">
+                    Years in Construction
                   </div>
-                </RevealAnimation>
-              ))}
+                  <div className="mt-1 font-sans text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-foreground/70">
+                    AJ Hoover
+                  </div>
+                </div>
+              </RevealAnimation>
+              <RevealAnimation animation="fade-up" delay={120}>
+                <div className="text-center px-4">
+                  <div className="font-display text-2xl sm:text-3xl md:text-4xl font-light mb-1 tracking-wide">CBC1260651</div>
+                  <div className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-accent">
+                    FL Certified Building Contractor
+                  </div>
+                </div>
+              </RevealAnimation>
             </div>
           </div>
 
@@ -722,9 +708,9 @@ const Home = () => {
                   <span aria-hidden className="absolute inset-0 translate-x-2 translate-y-2 border border-accent/25" />
                   <div className="relative bg-card border border-accent/25 p-5 shadow-[0_20px_40px_-18px_rgba(15,42,61,0.3)]">
                     <img
-                      src={nahbBadge.url}
+                      src={nahbBadge}
                       alt="NAHB Certified Master Building Professional"
-                      className="h-24 md:h-28 w-auto object-contain"
+                      className="h-16 w-auto object-contain"
                       loading="lazy"
                     />
                   </div>

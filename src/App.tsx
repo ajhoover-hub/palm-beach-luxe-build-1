@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { RouteTracker } from "@/components/RouteTracker";
+import { initGTM } from "@/lib/gtm";
+import { initGoogleAdsTag, installTelClickTracking } from "@/lib/adsConversions";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Process from "./pages/Process";
@@ -13,17 +16,23 @@ import Renovations from "./pages/Renovations";
 import Press from "./pages/Press";
 import Social from "./pages/Social";
 import Contact from "./pages/Contact";
+import ThankYou from "./pages/ThankYou";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Sitemap from "./pages/Sitemap";
 import Unsubscribe from "./pages/Unsubscribe";
 import NotFound from "./pages/NotFound";
 
+initGTM();
+initGoogleAdsTag();
+installTelClickTracking();
+
 const queryClient = new QueryClient();
 
 export const AppRoutes = () => (
   <>
     <ScrollToTop />
+    <RouteTracker />
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
@@ -33,6 +42,7 @@ export const AppRoutes = () => (
       <Route path="/press" element={<Press />} />
       <Route path="/social" element={<Social />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/sitemap" element={<Sitemap />} />

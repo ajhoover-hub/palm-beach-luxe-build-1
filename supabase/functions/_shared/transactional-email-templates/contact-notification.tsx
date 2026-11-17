@@ -19,9 +19,13 @@ interface Props {
   email?: string
   phone?: string
   message?: string
+  projectType?: string
+  timeline?: string
+  ownsLot?: string
+  investmentRange?: string
 }
 
-const Email = ({ fullName, email, phone, message }: Props) => (
+const Email = ({ fullName, email, phone, message, projectType, timeline, ownsLot, investmentRange }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>New contact form submission{fullName ? ` from ${fullName}` : ''}</Preview>
@@ -47,6 +51,30 @@ const Email = ({ fullName, email, phone, message }: Props) => (
               </Text>
             </>
           ) : null}
+
+          <Text style={label}>Project type</Text>
+          <Text style={value}>{projectType || '—'}</Text>
+
+          {timeline ? (
+            <>
+              <Text style={label}>Timeline</Text>
+              <Text style={value}>{timeline}</Text>
+            </>
+          ) : null}
+
+          {ownsLot ? (
+            <>
+              <Text style={label}>Owns a lot</Text>
+              <Text style={value}>{ownsLot}</Text>
+            </>
+          ) : null}
+
+          {investmentRange ? (
+            <>
+              <Text style={label}>Investment range</Text>
+              <Text style={value}>{investmentRange}</Text>
+            </>
+          ) : null}
         </Section>
 
         {message ? (
@@ -69,10 +97,14 @@ export const template = {
   displayName: 'Contact Form — Internal Notification',
   to: 'aj@bmbpalmbeach.com',
   previewData: {
-    fullName: 'Jane Doe',
-    email: 'jane@example.com',
+    fullName: 'Alex',
+    email: 'you@example.com',
     phone: '(561) 000-0000',
-    message: 'Interested in a new build on the Intracoastal.',
+    message: 'A few notes about the project, location, and timeline.',
+    projectType: 'New custom home',
+    timeline: '6-12 months',
+    ownsLot: 'Looking',
+    investmentRange: '[RANGE 1 — TBD]',
   },
 } satisfies TemplateEntry
 

@@ -1,10 +1,41 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { RevealAnimation } from "@/components/RevealAnimation";
 import { SEO } from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+
+const PROJECT_TYPES = ["New custom home", "Renovation", "Addition"] as const;
+const TIMELINES = ["0-6 months", "6-12 months", "12+ months", "Just exploring"] as const;
+const LOT_OPTIONS = ["Yes", "No", "Looking"] as const;
+/** Placeholder brackets until the real investment ranges are chosen. */
+const INVESTMENT_RANGES = [
+  "[RANGE 1 — TBD]",
+  "[RANGE 2 — TBD]",
+  "[RANGE 3 — TBD]",
+  "[RANGE 4 — TBD]",
+] as const;
+
+const optionalListed = (options: readonly string[]) =>
+  z.string().refine((value) => value === "" || options.includes(value), "Choose a listed option");
+
+const contactSchema = z.object({
+  firstName: z.string().trim().min(1, "First name is required"),
+  lastName: z.string().trim().min(1, "Last name is required"),
+  email: z.string().trim().email("A valid email is required"),
+  phone: z.string().trim(),
+  message: z.string().trim().min(1, "Tell us about your vision"),
+  projectType: z.string().refine(
+    (value) => (PROJECT_TYPES as readonly string[]).includes(value),
+    "Choose a project type",
+  ),
+  timeline: optionalListed(TIMELINES),
+  ownsLot: optionalListed(LOT_OPTIONS),
+  investmentRange: optionalListed(INVESTMENT_RANGES),
+});
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -14,31 +45,53 @@ const Contact = () => {
     email: "",
     phone: "",
     message: "",
+    projectType: "",
+    timeline: "",
+    ownsLot: "",
+    investmentRange: "",
   });
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const parsed = contactSchema.safeParse(formData);
+    if (!parsed.success) {
+      toast({
+        title: "Please review",
+        description: parsed.error.issues[0]?.message ?? "Please review the form.",
+        variant: "destructive",
+      });
+      return;
+    }
     setIsSubmitting(true);
 
     try {
-      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+      const data = parsed.data;
+      const fullName = `${data.firstName} ${data.lastName}`.trim();
+      const inquiry = {
+        projectType: data.projectType,
+        timeline: data.timeline,
+        ownsLot: data.ownsLot,
+        investmentRange: data.investmentRange,
+      };
 
       // 1. Internal notification to the office
       const { error: notifyError } = await supabase.functions.invoke("send-transactional-email", {
         body: {
           templateName: "contact-notification",
-          idempotencyKey: `contact-notify-${Date.now()}-${formData.email}`,
+          idempotencyKey: `contact-notify-${Date.now()}-${data.email}`,
           templateData: {
             fullName,
-            email: formData.email,
-            phone: formData.phone,
-            message: formData.message,
+            email: data.email,
+            phone: data.phone,
+            message: data.message,
+            ...inquiry,
           },
         },
       });
@@ -48,26 +101,14 @@ const Contact = () => {
       const { error: confirmError } = await supabase.functions.invoke("send-transactional-email", {
         body: {
           templateName: "contact-confirmation",
-          recipientEmail: formData.email,
-          idempotencyKey: `contact-confirm-${Date.now()}-${formData.email}`,
-          templateData: { firstName: formData.firstName },
+          recipientEmail: data.email,
+          idempotencyKey: `contact-confirm-${Date.now()}-${data.email}`,
+          templateData: { firstName: data.firstName, ...inquiry },
         },
       });
       if (confirmError) throw confirmError;
 
-      toast({
-        title: "Message Sent",
-        description: "Thank you for contacting us. We'll respond within 24 hours.",
-      });
-
-      // Reset form
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        message: "",
-      });
+      navigate("/thank-you?form=contact");
     } catch (error: any) {
       console.error("Error sending message:", error);
       toast({
@@ -110,7 +151,7 @@ const Contact = () => {
               </div>
               <div className="md:w-1/3">
                 <p className="font-sans text-foreground/70 font-light leading-relaxed text-base md:text-lg">
-                  Our office accepts a limited number of commissions each year. Share your vision and we will respond within twenty-four hours to arrange a private consultation on Worth Avenue.
+                  Our office accepts a limited number of commissions each year. Share your vision and we will respond within one business day to arrange a private consultation on Worth Avenue.
                 </p>
               </div>
             </div>
@@ -130,6 +171,14 @@ const Contact = () => {
                   <div className="grid md:grid-cols-2 gap-10 md:gap-12">
                     <FieldUnderline id="email" type="email" label="Direct Email" value={formData.email} onChange={handleInputChange} required placeholder="you@example.com" />
                     <FieldUnderline id="phone" type="tel" label="Contact Phone" value={formData.phone} onChange={handleInputChange} placeholder="(561) 000-0000" />
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-10 md:gap-12">
+                    <SelectUnderline id="projectType" label="Project Type" value={formData.projectType} onChange={handleInputChange} required options={PROJECT_TYPES} placeholder="Select" />
+                    <SelectUnderline id="timeline" label="Timeline" value={formData.timeline} onChange={handleInputChange} options={TIMELINES} placeholder="Select" />
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-10 md:gap-12">
+                    <SelectUnderline id="ownsLot" label="Do you own a lot?" value={formData.ownsLot} onChange={handleInputChange} options={LOT_OPTIONS} placeholder="Select" />
+                    <SelectUnderline id="investmentRange" label="Investment Range" value={formData.investmentRange} onChange={handleInputChange} options={INVESTMENT_RANGES} placeholder="Select" />
                   </div>
                   <FieldUnderline id="message" label="Tell Us About Your Vision" value={formData.message} onChange={handleInputChange} required textarea placeholder="A few notes about your project, location, and timeline…" />
 
@@ -271,6 +320,43 @@ const FieldUnderline = ({
     </div>
   );
 };
+
+const SelectUnderline = ({
+  id,
+  label,
+  value,
+  onChange,
+  required,
+  options,
+  placeholder,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  required?: boolean;
+  options: readonly string[];
+  placeholder: string;
+}) => (
+  <div className="group relative min-w-0">
+    <label htmlFor={id} className="block text-[9px] md:text-[10px] tracking-[0.35em] uppercase text-accent font-sans font-medium mb-1">
+      {label}
+    </label>
+    <select
+      id={id}
+      value={value}
+      onChange={onChange}
+      required={required}
+      className="w-full max-w-full bg-transparent border-b border-foreground/15 py-3 md:py-4 pr-6 font-sans font-light text-base md:text-lg text-foreground focus:outline-none transition-colors duration-500 peer appearance-none"
+    >
+      <option value="">{placeholder}</option>
+      {options.map((option) => (
+        <option key={option} value={option}>{option}</option>
+      ))}
+    </select>
+    <span className="pointer-events-none absolute bottom-0 left-0 h-px w-0 bg-accent transition-all duration-500 peer-focus:w-full" aria-hidden="true" />
+  </div>
+);
 
 const InfoBlock = ({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) => (
   <div className="relative pl-6 md:pl-8">

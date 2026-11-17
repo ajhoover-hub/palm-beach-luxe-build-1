@@ -119,8 +119,8 @@ function assertFile(file, { must = [], mustNot = [], h1 = 1, types = [] }) {
     if (serialized.includes('"1994"') || /1994/.test(serialized)) {
       throw new Error(`${file} JSON-LD still publishes 1994`);
     }
-    if (!serialized.includes('"foundingDate":"2015"')) {
-      throw new Error(`${file} JSON-LD is missing foundingDate 2015`);
+    if (serialized.includes("foundingDate")) {
+      throw new Error(`${file} JSON-LD still publishes foundingDate`);
     }
     const visible = html
       .replace(/<script[\s\S]*?<\/script>/gi, " ")
@@ -171,13 +171,12 @@ assertFile(home, {
     "(561) 646-8992",
     "Who builds custom homes in Palm Beach?",
     "What does a Palm Beach renovation involve?",
-    "50+ reviews across",
+    "https://search.google.com/local/writereview?placeid=ChIJyxLbsJ7X2IgRncs4Aeh_KC8",
     "instagram.com/bmbbuilders",
     'rel="canonical" href="https://bmbpalmbeach.com/"',
     'property="og:title"',
     'name="twitter:card"',
     "CBC1260651",
-    "1129 Rockledge Blvd",
   ],
   mustNot: [
     "aggregateRating",
@@ -191,6 +190,20 @@ assertFile(home, {
     "Years Excellence",
     "Project Value",
     "Estate Homes",
+    "1129 Rockledge",
+    "Rockledge",
+    "bmb.builders",
+    "+1-321-298-4122",
+    "Space Coast",
+    "Brevard",
+    "Melbourne",
+    "50+ reviews",
+    "50+ Reviews",
+    "premier",
+    "foundingDate",
+    "24 hours",
+    "since 1994",
+    "Since 1994",
   ],
   types: [
     "HomeAndConstructionBusiness",

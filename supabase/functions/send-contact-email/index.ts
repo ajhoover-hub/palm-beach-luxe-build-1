@@ -17,6 +17,10 @@ interface ContactEmailRequest {
   message?: string;
   style?: string;
   source?: string;
+  projectType?: string;
+  timeline?: string;
+  ownsLot?: string;
+  investmentRange?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -34,6 +38,10 @@ const handler = async (req: Request): Promise<Response> => {
       message = "",
       style,
       source,
+      projectType,
+      timeline,
+      ownsLot,
+      investmentRange,
     }: ContactEmailRequest = await req.json();
 
     // Validate required fields. Style Book inquiries don't require lastName or message.
@@ -73,6 +81,10 @@ const handler = async (req: Request): Promise<Response> => {
             <p style="margin: 10px 0; color: #555;"><strong>Name:</strong> ${fullName}</p>
             <p style="margin: 10px 0; color: #555;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #B8860B;">${email}</a></p>
             ${phone ? `<p style="margin: 10px 0; color: #555;"><strong>Phone:</strong> <a href="tel:${phone}" style="color: #B8860B;">${phone}</a></p>` : ''}
+            ${projectType ? `<p style="margin: 10px 0; color: #555;"><strong>Project type:</strong> ${projectType}</p>` : ''}
+            ${timeline ? `<p style="margin: 10px 0; color: #555;"><strong>Timeline:</strong> ${timeline}</p>` : ''}
+            ${ownsLot ? `<p style="margin: 10px 0; color: #555;"><strong>Owns a lot:</strong> ${ownsLot}</p>` : ''}
+            ${investmentRange ? `<p style="margin: 10px 0; color: #555;"><strong>Investment range:</strong> ${investmentRange}</p>` : ''}
           </div>
 
           ${message ? `<div style="background: #f9f9f9; padding: 30px;">
@@ -107,8 +119,15 @@ const handler = async (req: Request): Promise<Response> => {
           </p>
 
           <p style="color: #555; line-height: 1.8; font-size: 16px;">
-            Our team will review your inquiry and respond within 24 hours to schedule your private consultation.
+            Our team will review your inquiry and respond within one business day to schedule your private consultation.
           </p>
+          ${projectType || timeline || ownsLot || investmentRange ? `
+          <div style="background: #f9f9f9; padding: 24px 30px; margin-top: 8px;">
+            ${projectType ? `<p style="margin: 8px 0; color: #555;"><strong>Project type:</strong> ${projectType}</p>` : ''}
+            ${timeline ? `<p style="margin: 8px 0; color: #555;"><strong>Timeline:</strong> ${timeline}</p>` : ''}
+            ${ownsLot ? `<p style="margin: 8px 0; color: #555;"><strong>Owns a lot:</strong> ${ownsLot}</p>` : ''}
+            ${investmentRange ? `<p style="margin: 8px 0; color: #555;"><strong>Investment range:</strong> ${investmentRange}</p>` : ''}
+          </div>` : ''}
           
           <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #eee;">
             <p style="color: #333; font-weight: 500; margin-bottom: 10px;">Beau Monde Builders Palm Beach</p>

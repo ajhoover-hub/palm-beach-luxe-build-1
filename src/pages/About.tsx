@@ -9,7 +9,7 @@ import { IDS } from "@/lib/site";
 import { Award, Shield, Users, FileCheck } from "lucide-react";
 import ajImageAsset from "@/assets/aj-hoover-v3.png.asset.json";
 import fcmbLogo from "@/assets/fcmb-logo.png";
-import nahbBadge from "@/assets/nahb-master-building-professional.png.asset.json";
+import nahbBadge from "@/assets/nahb-certified-master-building-professional-badge.png";
 import michelleImage from "@/assets/michelle-williams.jpg";
 import michelleWebp from "@/assets/michelle-williams.webp";
 import michelleAvif from "@/assets/michelle-williams.avif";
@@ -308,11 +308,13 @@ const About = () => {
                       src: fcmbLogo,
                       alt: "Florida Certified Master Builder",
                       cap: "Florida Certified Master Builder",
+                      imgClass: "w-32 h-32 md:w-44 md:h-44 object-contain",
                     },
                     {
-                      src: nahbBadge.url,
+                      src: nahbBadge,
                       alt: "NAHB Certified Master Building Professional",
                       cap: "NAHB Master Building Professional",
+                      imgClass: "h-16 w-auto object-contain",
                     },
                   ].map((b) => (
                     <div key={b.cap} className="flex flex-col items-center">
@@ -322,8 +324,7 @@ const About = () => {
                           alt={b.alt}
                           loading="lazy"
                           decoding="async"
-                          onError={(e) => { e.currentTarget.src = "/placeholder.svg"; }}
-                          className="w-32 h-32 md:w-44 md:h-44 object-contain"
+                          className={b.imgClass}
                         />
                       </div>
                       <div className="mt-4 h-px w-6 bg-accent" />

@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import HTMLFlipBook from "react-pageflip";
 import { Navigation } from "@/components/Navigation";
@@ -431,6 +431,7 @@ const inquirySchema = z.object({
 
 const InquiryPlate = ({ defaultStyle }: { defaultStyle?: string }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
@@ -511,18 +512,8 @@ const InquiryPlate = ({ defaultStyle }: { defaultStyle?: string }) => {
         },
       });
       if (confirmError) throw confirmError;
-      toast({
-        title: "Sent to Beau Monde",
-        description: "We'll be in touch within 24 hours.",
-      });
-      setForm({
-        style: defaultStyle ?? STYLE_OPTIONS[0],
-        name: "",
-        email: "",
-        phone: "",
-        note: "",
-      });
       styleTouched.current = false;
+      navigate("/thank-you?form=stylebook");
     } catch (err) {
       console.error("Style Book inquiry failed:", err);
       toast({
@@ -667,7 +658,7 @@ const InquiryPlate = ({ defaultStyle }: { defaultStyle?: string }) => {
         variants={fadeUp}
         className="font-sans text-[9px] tracking-[0.4em] uppercase text-accent/70 mt-3"
       >
-        Replies within 24 hours · 205 Worth Avenue
+        Replies within one business day · 205 Worth Avenue
       </motion.p>
     </div>
   );

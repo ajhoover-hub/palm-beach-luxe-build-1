@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
@@ -9,7 +10,7 @@ const Terms = () => {
       <SEO
         title="Terms of Service | Beau Monde Builders Palm Beach"
         path="/terms"
-        description="Terms for using the Beau Monde Builders Palm Beach website and for contacting the Worth Avenue office."
+        description="Terms and conditions governing use of the Beau Monde Builders, Inc. website."
         breadcrumbs={[
           { name: "Home", path: "/" },
           { name: "Terms", path: "/terms" },
@@ -48,7 +49,7 @@ const Terms = () => {
                   <div>
                     <h2 className="text-2xl font-display font-light mb-4">Agreement to Terms</h2>
                     <p className="text-muted-foreground font-light leading-relaxed">
-                      By accessing and using the Beau Monde Builders website ("Site"), you agree to be bound by 
+                      By accessing and using the Beau Monde Builders, Inc. ("Company") website ("Site"), you agree to be bound by 
                       these Terms of Service ("Terms"). If you disagree with any part of these terms, you may 
                       not access the Site. These Terms apply to all visitors, users, and others who access or 
                       use the Site.
@@ -72,10 +73,20 @@ const Terms = () => {
                   </div>
 
                   <div>
+                    <h2 className="text-2xl font-display font-light mb-4">Inquiries and Communications</h2>
+                    <p className="text-muted-foreground font-light leading-relaxed">
+                      Inquiries are submitted through the contact form and the Style Book request form. A confirmation email follows submission. You may opt out of emails through the unsubscribe link or at{" "}
+                      <Link to="/unsubscribe" className="text-accent hover:underline">/unsubscribe</Link>.
+                      Submitting an inquiry creates no contract or obligation. Collection and use of information is described in our{" "}
+                      <Link to="/privacy" className="text-accent hover:underline">Privacy Policy</Link>.
+                    </p>
+                  </div>
+
+                  <div>
                     <h2 className="text-2xl font-display font-light mb-4">Intellectual Property</h2>
                     <p className="text-muted-foreground font-light leading-relaxed">
                       The Site and its original content, features, and functionality are owned by Beau Monde 
-                      Builders and are protected by international copyright, trademark, patent, trade secret, 
+                      Builders, Inc. and are protected by international copyright, trademark, trade secret, 
                       and other intellectual property laws. Our trademarks and trade dress may not be used in 
                       connection with any product or service without our prior written consent.
                     </p>
@@ -85,7 +96,7 @@ const Terms = () => {
                     <h2 className="text-2xl font-display font-light mb-4">Project Images and Portfolio</h2>
                     <p className="text-muted-foreground font-light leading-relaxed">
                       All project images, photographs, renderings, and portfolio materials displayed on our 
-                      website are the property of Beau Monde Builders or used with permission. These materials 
+                      website are the property of Beau Monde Builders, Inc. or used with permission. These materials 
                       may not be copied, reproduced, distributed, or used without our express written permission. 
                       Some images may represent conceptual designs or completed projects and are for illustrative 
                       purposes only.
@@ -131,7 +142,7 @@ const Terms = () => {
                   <div>
                     <h2 className="text-2xl font-display font-light mb-4">Limitation of Liability</h2>
                     <p className="text-muted-foreground font-light leading-relaxed">
-                      In no event shall Beau Monde Builders, its directors, employees, partners, agents, 
+                      In no event shall Beau Monde Builders, Inc., its officers, directors, employees, agents, 
                       suppliers, or affiliates be liable for any indirect, incidental, special, consequential, 
                       or punitive damages, including without limitation, loss of profits, data, use, goodwill, 
                       or other intangible losses, resulting from your access to or use of (or inability to 
@@ -142,8 +153,8 @@ const Terms = () => {
                   <div>
                     <h2 className="text-2xl font-display font-light mb-4">Indemnification</h2>
                     <p className="text-muted-foreground font-light leading-relaxed">
-                      You agree to defend, indemnify, and hold harmless Beau Monde Builders and its licensees, 
-                      licensors, employees, contractors, agents, officers, and directors from and against any 
+                      You agree to defend, indemnify, and hold harmless Beau Monde Builders, Inc. and its officers, 
+                      directors, employees, and agents from and against any 
                       claims, damages, obligations, losses, liabilities, costs, or debt arising from your use 
                       of and access to the Site or your violation of these Terms.
                     </p>
@@ -153,9 +164,11 @@ const Terms = () => {
                     <h2 className="text-2xl font-display font-light mb-4">Third-Party Links</h2>
                     <p className="text-muted-foreground font-light leading-relaxed">
                       Our Site may contain links to third-party websites or services that are not owned or 
-                      controlled by Beau Monde Builders. We have no control over and assume no responsibility 
+                      controlled by Beau Monde Builders, Inc. We have no control over and assume no responsibility 
                       for the content, privacy policies, or practices of any third-party websites or services. 
                       We strongly advise you to read the terms and conditions of any third-party sites you visit.
+                      Our Privacy Policy is available at{" "}
+                      <Link to="/privacy" className="text-accent hover:underline">/privacy</Link>.
                     </p>
                   </div>
 
@@ -196,7 +209,7 @@ const Terms = () => {
                       If you have any questions about these Terms of Service, please contact us at:
                     </p>
                     <div className="mt-4 p-6 bg-secondary rounded-lg">
-                      <p className="text-foreground font-medium">Beau Monde Builders</p>
+                      <p className="text-foreground font-medium">Beau Monde Builders, Inc.</p>
                       <p className="text-muted-foreground font-light">205 Worth Avenue, Suite 120</p>
                       <p className="text-muted-foreground font-light">Palm Beach, FL 33480</p>
                       <p className="text-muted-foreground font-light mt-2">
