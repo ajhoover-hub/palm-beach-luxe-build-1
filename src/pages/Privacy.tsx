@@ -104,10 +104,42 @@ const Privacy = () => {
                   <div>
                     <h2 className="text-2xl font-display font-light mb-4">Cookies and Tracking</h2>
                     <p className="text-muted-foreground font-light leading-relaxed">
-                      Our website may use cookies and similar tracking technologies to enhance your browsing 
-                      experience. You can set your browser to refuse cookies or alert you when cookies are 
-                      being sent. However, some features of our website may not function properly without cookies.
+                      Our website may use cookies and similar tracking technologies. You can set your browser 
+                      to refuse cookies or alert you when cookies are being sent. The Google measurement tools 
+                      described below are not required to view the site or to submit an inquiry.
                     </p>
+                  </div>
+
+                  <div>
+                    <h2 className="text-2xl font-display font-light mb-4">Analytics, Advertising and Cookies</h2>
+                    <p className="text-muted-foreground font-light leading-relaxed mb-4">
+                      The site may use Google Tag Manager and the Google Ads tag (gtag.js), which set cookies or similar technologies.
+                    </p>
+                    <p className="text-muted-foreground font-light leading-relaxed mb-4">
+                      These measure visits and pages viewed, record when a contact or Style Book form is submitted (on the thank-you page), and record when a phone number link is tapped. The purpose is to measure the effectiveness of our advertising.
+                    </p>
+                    <p className="text-muted-foreground font-light leading-relaxed mb-4">
+                      Google may collect device and browser information, IP address and cookie identifiers. See{" "}
+                      <a href="https://policies.google.com/technologies/partner-sites" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
+                        How Google uses information from sites or apps that use our services
+                      </a>.
+                    </p>
+                    <p className="text-muted-foreground font-light leading-relaxed mb-4">
+                      You can limit this measurement through:
+                    </p>
+                    <ul className="list-disc list-inside text-muted-foreground font-light space-y-2 mb-4">
+                      <li>
+                        <a href="https://adssettings.google.com" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
+                          Google Ads Settings
+                        </a>
+                      </li>
+                      <li>Your browser's cookie controls</li>
+                      <li>
+                        <a href="https://optout.networkadvertising.org" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
+                          Network Advertising Initiative opt-out
+                        </a>
+                      </li>
+                    </ul>
                   </div>
 
                   <div>

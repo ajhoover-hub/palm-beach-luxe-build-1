@@ -8,7 +8,8 @@ import { IDS, RENOVATION_FAQS } from "@/lib/site";
 import { RenovationsHero } from "@/components/RenovationsHero";
 import renovationMoment from "@/assets/projects/renovation-hero.jpg.asset.json";
 import fcmbLogo from "@/assets/fcmb-logo.png";
-import nahbBadge from "@/assets/nahb-master-building-professional.png.asset.json";
+import { formatInitials } from "@/components/AjName";
+import nahbBadge from "@/assets/nahb-certified-master-building-professional-badge.png";
 import renovationBefore from "@/assets/renovation-before.jpg.asset.json";
 import renovationAfter from "@/assets/renovation-after.jpg.asset.json";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
@@ -195,7 +196,7 @@ const Renovations = () => {
                 </h1>
 
                 <p className="font-sans font-light text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mb-12">
-                  Led by AJ Hoover, with 30 years in the construction industry — now applied to the
+                  Led by {formatInitials("AJ Hoover")}, with 30 years in the construction industry — now applied to the
                   residences you already love. Every renovation is led personally, scheduled
                   around your life, and finished to the same standard as our ground-up estates.
                 </p>
@@ -302,9 +303,9 @@ const Renovations = () => {
                       <span aria-hidden className="absolute inset-0 translate-x-2 translate-y-2 border border-accent/25" />
                       <div className="relative bg-card border border-accent/25 p-5 shadow-[0_20px_40px_-18px_rgba(15,42,61,0.3)]">
                         <img
-                          src={nahbBadge.url}
+                          src={nahbBadge}
                           alt="NAHB Certified Master Building Professional"
-                          className="h-24 md:h-28 w-auto object-contain"
+                          className="h-16 w-auto object-contain"
                           loading="lazy"
                         />
                       </div>
@@ -333,7 +334,7 @@ const Renovations = () => {
                       {row.k}
                     </span>
                     <span className="font-sans font-light text-[13px] text-primary/85 text-right">
-                      {row.v}
+                      {formatInitials(row.v)}
                     </span>
                   </div>
                 </RevealAnimation>

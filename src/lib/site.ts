@@ -16,17 +16,8 @@ export const PALM_BEACH = {
   addressCountry: "US",
 } as const;
 
-export const ROCKLEDGE = {
-  streetAddress: "1129 Rockledge Blvd Ste 101",
-  addressLocality: "Rockledge",
-  addressRegion: "FL",
-  postalCode: "32955",
-  addressCountry: "US",
-} as const;
-
 export const PALM_BEACH_PHONE = "+1-561-646-8992";
 export const PALM_BEACH_PHONE_DISPLAY = "(561) 646-8992";
-export const ROCKLEDGE_PHONE = "+1-321-298-4122";
 export const PUBLIC_EMAIL = "aj@bmbpalmbeach.com";
 
 export const LICENSE = {
@@ -51,12 +42,14 @@ export const SERVICE_AREAS = [
 
 export const IDS = {
   palmBeach: `${SITE}/#palm-beach`,
-  parent: "https://www.bmb.builders/#organization",
   person: `${SITE}/#aj-hoover`,
   website: `${SITE}/#website`,
 } as const;
 
-/** Confirmed profiles. Google Maps links are search URLs, not place IDs. */
+/** Palm Beach Google Business Profile. Confirmed place ID for this office. */
+export const GOOGLE_PLACE_ID = "ChIJyxLbsJ7X2IgRncs4Aeh_KC8";
+
+/** Confirmed profiles. The Palm Beach listing uses its place ID. */
 export const SOCIAL_LINKS = {
   instagram: {
     href: "https://www.instagram.com/bmbbuilders/",
@@ -79,13 +72,13 @@ export const SOCIAL_LINKS = {
 } as const;
 
 export const REVIEW_LINKS = {
-  googleRockledge: {
-    href: "https://www.google.com/maps/search/?api=1&query=Beau+Monde+Builders%2C+1129+Rockledge+Blvd+Ste+101%2C+Rockledge%2C+FL",
-    label: "Google (Rockledge)",
-  },
   googlePalmBeach: {
-    href: "https://www.google.com/maps/search/?api=1&query=Beau+Monde+Builders%2C+205+Worth+Avenue+Suite+120%2C+Palm+Beach%2C+FL",
+    href: `https://www.google.com/maps/place/?q=place_id:${GOOGLE_PLACE_ID}`,
     label: "Google (Palm Beach)",
+  },
+  googleWriteReview: {
+    href: `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}`,
+    label: "Google reviews",
   },
   houzz: {
     href: "https://www.houzz.com/professionals/general-contractors/beau-monde-builders-inc-pfvwus-pf~1921934198",
@@ -93,17 +86,14 @@ export const REVIEW_LINKS = {
   },
 } as const;
 
-const BBB_PROFILE =
-  "https://www.bbb.org/us/fl/rockledge/profile/home-builders/beau-monde-builders-inc-0733-90709521";
-
 const CHAMBER_PROFILE =
   "https://business.palmbeaches.org/business-directory/Details/beau-monde-builders-4720823";
 
 /**
  * Identity links only. No aggregateRating and no reviewCount:
  * Google treats self-serving review markup on a LocalBusiness as ineligible.
- * Houzz is included because it is a confirmed profile. Google Maps search
- * URLs are hasMap links, not sameAs, until a place ID is confirmed.
+ * Houzz is included because it is a confirmed profile.
+ * The Palm Beach Google listing is a hasMap link, not sameAs.
  * Yelp is named on the page but has no confirmed business URL here.
  */
 export const SAME_AS = [
@@ -112,7 +102,6 @@ export const SAME_AS = [
   SOCIAL_LINKS.linkedin.href,
   SOCIAL_LINKS.youtube.href,
   REVIEW_LINKS.houzz.href,
-  BBB_PROFILE,
   CHAMBER_PROFILE,
 ] as const;
 
@@ -125,6 +114,7 @@ export const PUBLIC_PATHS = [
   "/press",
   "/social",
   "/contact",
+  "/thank-you",
   "/privacy",
   "/terms",
   "/sitemap",
@@ -137,7 +127,7 @@ export const HOME_FAQS: FaqItem[] = [
   {
     question: "Who builds custom homes in Palm Beach?",
     answer:
-      "Beau Monde Builders builds custom homes from its Palm Beach office at 205 Worth Avenue, Suite 120, Palm Beach, Florida 33480. The phone number there is (561) 646-8992, and the email is aj@bmbpalmbeach.com. The firm is led by AJ Hoover, a Florida Certified Master Builder, an NAHB Certified Master Building Professional, and a Florida Certified Building Contractor (license CBC1260651), with 30 years in the construction industry. Headquarters is 1129 Rockledge Blvd, Suite 101, Rockledge, Florida. The Rockledge office publishes its own site at bmb.builders.",
+      "Beau Monde Builders builds custom homes from its Palm Beach office at 205 Worth Avenue, Suite 120, Palm Beach, Florida 33480. The phone number there is (561) 646-8992, and the email is aj@bmbpalmbeach.com. The firm is led by AJ Hoover, a Florida Certified Master Builder, an NAHB Certified Master Building Professional, and a Florida Certified Building Contractor (license CBC1260651), with 30 years in the construction industry.",
   },
   {
     question: "What does a Palm Beach renovation involve?",
@@ -199,7 +189,7 @@ const services: { id: string; name: string; description: string; url: string }[]
   },
 ];
 
-function postalAddress(address: typeof PALM_BEACH | typeof ROCKLEDGE) {
+function postalAddress(address: typeof PALM_BEACH) {
   return { "@type": "PostalAddress", ...address };
 }
 
@@ -213,9 +203,8 @@ const palmBeachBusiness = {
     "@type": "ImageObject",
     url: `${SITE}/favicon.png`,
   },
-  foundingDate: "2015",
   description:
-    "Beau Monde Builders is a custom home builder and renovation firm founded in 2015. The Palm Beach office is at 205 Worth Avenue, Suite 120, Palm Beach, Florida. Headquarters is in Rockledge, Florida. AJ Hoover, the chief executive, has 30 years in the construction industry.",
+    "Beau Monde Builders is a custom home builder and renovation firm. The Palm Beach office is at 205 Worth Avenue, Suite 120, Palm Beach, Florida. AJ Hoover, the chief executive, has 30 years in the construction industry.",
   telephone: PALM_BEACH_PHONE,
   email: PUBLIC_EMAIL,
   address: postalAddress(PALM_BEACH),
@@ -225,7 +214,6 @@ const palmBeachBusiness = {
     longitude: "-80.0370",
   },
   hasMap: REVIEW_LINKS.googlePalmBeach.href,
-  parentOrganization: { "@id": IDS.parent },
   founder: { "@id": IDS.person },
   employee: { "@id": IDS.person },
   sameAs: [...SAME_AS],
@@ -249,20 +237,6 @@ const palmBeachBusiness = {
   },
 };
 
-const parentOrganization = {
-  "@type": "Organization",
-  "@id": IDS.parent,
-  name: SITE_NAME,
-  url: "https://www.bmb.builders/",
-  foundingDate: "2015",
-  description:
-    "Beau Monde Builders, founded in 2015, is headquartered at 1129 Rockledge Blvd, Suite 101, Rockledge, Florida. The Palm Beach office is a separate site at bmbpalmbeach.com.",
-  telephone: ROCKLEDGE_PHONE,
-  address: postalAddress(ROCKLEDGE),
-  hasMap: REVIEW_LINKS.googleRockledge.href,
-  subOrganization: { "@id": IDS.palmBeach },
-};
-
 const person = {
   "@type": "Person",
   "@id": IDS.person,
@@ -273,7 +247,7 @@ const person = {
   image: absoluteUrl(ajPortrait.url),
   telephone: PALM_BEACH_PHONE,
   email: PUBLIC_EMAIL,
-  worksFor: [{ "@id": IDS.parent }, { "@id": IDS.palmBeach }],
+  worksFor: [{ "@id": IDS.palmBeach }],
   hasCredential: [
     {
       "@type": "EducationalOccupationalCredential",
@@ -366,7 +340,6 @@ export function structuredData(opts: {
 }) {
   const graph: Record<string, unknown>[] = [
     palmBeachBusiness,
-    parentOrganization,
     person,
     website,
     ...serviceNodes,

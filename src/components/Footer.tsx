@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import fcmbLogo from "@/assets/fcmb-logo.png";
-import nahbBadge from "@/assets/nahb-master-building-professional.png.asset.json";
+import nahbBadge from "@/assets/nahb-certified-master-building-professional-badge.png";
 import { SERVICE_AREAS } from "@/lib/site";
+import { formatInitials } from "@/components/AjName";
 
 export const Footer = () => {
   return (
@@ -20,9 +21,7 @@ export const Footer = () => {
               </span>
             </div>
             <p className="text-sm font-light leading-relaxed max-w-sm text-primary-foreground/70">
-              Creating Palm Beach's most distinguished estates through architectural excellence
-              and uncompromising craftsmanship. Led by AJ Hoover, with 30 years in the construction
-              industry. Beau Monde Builders, founded 2015.
+              Creating distinguished Palm Beach estates through architectural excellence and uncompromising craftsmanship. {formatInitials("AJ Hoover")} · 30 years in construction.
             </p>
           </div>
 
@@ -40,7 +39,7 @@ export const Footer = () => {
               ].map((item) => (
                 <li key={item.label}>
                   <Link to={item.path} className="hover:text-primary-foreground transition-colors">
-                    {item.label}
+                    {formatInitials(item.label)}
                   </Link>
                 </li>
               ))}
@@ -59,7 +58,7 @@ export const Footer = () => {
               ].map((item) => (
                 <li key={item.label}>
                   <Link to={item.path} className="hover:text-primary-foreground transition-colors">
-                    {item.label}
+                    {formatInitials(item.label)}
                   </Link>
                 </li>
               ))}
@@ -103,50 +102,50 @@ export const Footer = () => {
 
         {/* Credentials Row — engraved colophon */}
         <div className="border-t border-b border-accent/15 py-10 mb-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-10 md:gap-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-10 md:gap-6 max-w-full">
             {/* Certification Medallions — FCMB + NAHB */}
-            <div className="flex items-center gap-8">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-background/5 p-1 ring-1 ring-accent/40 flex items-center justify-center">
+            <div className="flex flex-col min-[480px]:flex-row flex-wrap items-center justify-center gap-x-8 gap-y-6 max-w-full">
+              <div className="flex items-center gap-4 max-w-full min-w-0">
+                <div className="w-16 h-16 shrink-0 rounded-full bg-background/5 p-1 ring-1 ring-accent/40 flex items-center justify-center">
                   <img
                     src={fcmbLogo}
                     alt="Florida Certified Master Builder"
                     className="h-full w-full object-contain"
                   />
                 </div>
-                <span className="text-[10px] uppercase tracking-[0.3em] leading-tight text-primary-foreground/70">
+                <span className="min-w-0 text-[10px] uppercase tracking-[0.3em] leading-tight text-primary-foreground/70">
                   Florida Certified<br />Master Builder
                 </span>
               </div>
               <div aria-hidden className="hidden md:block w-px h-12 bg-accent/25" />
-              <div className="flex items-center gap-4">
-                <div className="h-16 rounded-md bg-background/95 px-2 py-1.5 ring-1 ring-accent/40 shadow-[0_12px_32px_hsl(var(--primary-foreground)/0.12)] flex items-center justify-center">
+              <div className="flex items-center gap-4 max-w-full min-w-0">
+                <div className="h-16 shrink-0 rounded-md bg-background/95 px-1.5 ring-1 ring-accent/40 shadow-[0_12px_32px_hsl(var(--primary-foreground)/0.12)] flex items-center justify-center">
                   <img
-                    src={nahbBadge.url}
+                    src={nahbBadge}
                     alt="NAHB Certified Master Building Professional"
-                    className="h-full w-auto object-contain"
+                    className="h-16 w-auto object-contain"
                   />
                 </div>
-                <span className="text-[10px] uppercase tracking-[0.3em] leading-tight text-primary-foreground/70">
+                <span className="min-w-0 text-[10px] uppercase tracking-[0.3em] leading-tight text-primary-foreground/70">
                   NAHB Certified<br />Master Building Professional
                 </span>
               </div>
             </div>
 
             {/* Engraved credential set */}
-            <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
+            <div className="flex flex-wrap justify-center gap-x-8 gap-y-6 max-w-full">
               {[
-                { eyebrow: "Accredited", line: "Fully Insured" },
+                { eyebrow: "Accredited", line: "Licensed and Insured" },
                 { eyebrow: "State Registered", line: "FL Licensed Contractor" },
-              { eyebrow: "Established", line: "Beau Monde Builders · Est. 2015" },
+                { eyebrow: "Principal", line: "AJ Hoover · 30 Years in Construction" },
               ].map((c, i, arr) => (
-                <div key={c.eyebrow} className="flex items-center gap-x-12">
-                  <div className="text-center">
+                <div key={c.eyebrow} className="flex items-center gap-x-8 max-w-full min-w-0">
+                  <div className="text-center max-w-full min-w-0">
                     <span className="block font-display italic text-[11px] uppercase tracking-[0.25em] text-accent mb-1.5">
                       {c.eyebrow}
                     </span>
-                    <span className="text-xs uppercase tracking-[0.2em] text-primary-foreground/85">
-                      {c.line}
+                    <span className="block max-w-[15rem] mx-auto text-xs uppercase tracking-[0.2em] leading-relaxed text-primary-foreground/85">
+                      {formatInitials(c.line)}
                     </span>
                   </div>
                   {i < arr.length - 1 && (
@@ -160,7 +159,7 @@ export const Footer = () => {
 
         {/* Legal */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] uppercase tracking-[0.2em] text-primary-foreground/40">
-          <p>&copy; {new Date().getFullYear()} Beau Monde Builders. All rights reserved.</p>
+          <p className="normal-case tracking-normal">&copy; {new Date().getFullYear()} Beau Monde Builders, Inc.</p>
           <div className="flex gap-8">
             <Link to="/privacy" className="hover:text-primary-foreground/80 transition-colors">Privacy</Link>
             <Link to="/terms" className="hover:text-primary-foreground/80 transition-colors">Terms</Link>

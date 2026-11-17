@@ -2,6 +2,7 @@ import { RevealAnimation } from "@/components/RevealAnimation";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Parallax } from "@/components/Parallax";
+import { formatInitials } from "@/components/AjName";
 
 interface InterviewShowcaseProps {
   iframeSrc?: string;
@@ -64,7 +65,7 @@ export const InterviewShowcase = ({
 
               <RevealAnimation animation="fade-up" delay={220}>
                 <p className="font-serif italic font-light text-primary-foreground/80 text-lg md:text-xl leading-relaxed mb-8 max-w-md">
-                  A candid interview with AJ Hoover, on site at the residence he just delivered.
+                  A candid interview with {formatInitials("AJ Hoover")}, on site at the residence he just delivered.
                 </p>
               </RevealAnimation>
 
@@ -72,7 +73,7 @@ export const InterviewShowcase = ({
                 <div className="flex items-center gap-3 mb-8">
                   <div className="h-px w-8 bg-accent" />
                   <span className="font-sans uppercase text-primary-foreground/70 text-[10px] md:text-xs tracking-[0.3em] font-light">
-                    With AJ Hoover · CEO, Beau Monde Builders
+                    With {formatInitials("AJ Hoover")} · CEO, Beau Monde Builders
                   </span>
                 </div>
               </RevealAnimation>

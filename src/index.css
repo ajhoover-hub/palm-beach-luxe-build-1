@@ -94,6 +94,16 @@ All colors MUST be HSL.
 }
 
 @layer base {
+  /*
+   * Fira Sans and Cormorant draw a descending capital J, so "AJ" reads as "Aj"
+   * at body size. Chrome's text-transform: capitalize also rewrites "AJ" to "Aj"
+   * by lowercasing the rest of the word. .aj-name keeps both letters capitals.
+   */
+  .aj-name {
+    font-family: Arial, "Helvetica Neue", "Liberation Sans", sans-serif;
+    text-transform: none;
+  }
+
   * {
     @apply border-border;
   }

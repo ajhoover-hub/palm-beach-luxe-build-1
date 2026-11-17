@@ -15,9 +15,13 @@ import type { TemplateEntry } from './registry.ts'
 
 interface Props {
   firstName?: string
+  projectType?: string
+  timeline?: string
+  ownsLot?: string
+  investmentRange?: string
 }
 
-const Email = ({ firstName }: Props) => (
+const Email = ({ firstName, projectType, timeline, ownsLot, investmentRange }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>Thank you for contacting Beau Monde Builders</Preview>
@@ -31,8 +35,16 @@ const Email = ({ firstName }: Props) => (
           We have received your inquiry and appreciate you reaching out to Beau Monde Builders.
         </Text>
         <Text style={text}>
-          Our office will review your message and respond within twenty-four hours to arrange a private consultation on Worth Avenue.
+          Our office will review your message and respond within one business day to arrange a private consultation on Worth Avenue.
         </Text>
+        <Section style={card}>
+          <Text style={label}>Project type</Text>
+          <Text style={value}>{projectType || '—'}</Text>
+          {timeline ? <><Text style={label}>Timeline</Text><Text style={value}>{timeline}</Text></> : null}
+          {ownsLot ? <><Text style={label}>Owns a lot</Text><Text style={value}>{ownsLot}</Text></> : null}
+          <Text style={label}>Investment range</Text>
+          <Text style={value}>{investmentRange?.trim() ? investmentRange : 'Not specified'}</Text>
+        </Section>
         <Hr style={hr} />
         <Text style={signature}>Beau Monde Builders</Text>
         <Text style={meta}>205 Worth Avenue, Suite 120</Text>
@@ -47,7 +59,13 @@ export const template = {
   component: Email,
   subject: 'Thank You for Contacting Beau Monde Builders',
   displayName: 'Contact Form — Confirmation',
-  previewData: { firstName: 'Jane' },
+  previewData: {
+    firstName: 'Alex',
+    projectType: 'New custom home',
+    timeline: '6-12 months',
+    ownsLot: 'Looking',
+    investmentRange: '$5M–$10M',
+  },
 } satisfies TemplateEntry
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Georgia, "Cormorant Garamond", serif' }
@@ -56,6 +74,9 @@ const header = { marginBottom: '32px' }
 const eyebrow = { fontSize: '11px', letterSpacing: '0.35em', color: '#b08a4a', fontFamily: 'Arial, sans-serif', margin: 0 }
 const h1 = { color: '#0f2a3d', fontSize: '32px', fontWeight: 300, fontStyle: 'italic', margin: '0 0 24px' }
 const text = { color: '#3a4a55', fontSize: '16px', lineHeight: '1.7', margin: '0 0 16px' }
+const card = { backgroundColor: '#f5f0e6', padding: '20px 24px', margin: '8px 0 16px', borderLeft: '2px solid #b08a4a' }
+const label = { color: '#b08a4a', fontSize: '10px', letterSpacing: '0.25em', textTransform: 'uppercase' as const, margin: '12px 0 4px', fontFamily: 'Arial, sans-serif' }
+const value = { color: '#0f2a3d', fontSize: '16px', margin: '0 0 8px' }
 const hr = { borderTop: '1px solid #e0d5c2', margin: '40px 0 24px' }
 const signature = { color: '#0f2a3d', fontSize: '14px', fontWeight: 500, margin: '0 0 12px', fontFamily: 'Arial, sans-serif' }
 const meta = { color: '#6b7a85', fontSize: '13px', margin: '4px 0', fontFamily: 'Arial, sans-serif' }

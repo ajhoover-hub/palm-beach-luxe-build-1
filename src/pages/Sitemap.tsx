@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
+import { formatInitials } from "@/components/AjName";
 import { RevealAnimation } from "@/components/RevealAnimation";
 import { Home, Users, Cog, Image, Share2, Mail, FileText, Shield, Hammer } from "lucide-react";
 
@@ -94,10 +95,10 @@ const Sitemap = () => {
                                 </div>
                                 <div>
                                   <span className="block text-foreground font-medium group-hover:text-accent transition-colors">
-                                    {link.name}
+                                    {formatInitials(link.name)}
                                   </span>
                                   <span className="text-sm text-muted-foreground font-light">
-                                    {link.description}
+                                    {formatInitials(link.description)}
                                   </span>
                                 </div>
                               </Link>

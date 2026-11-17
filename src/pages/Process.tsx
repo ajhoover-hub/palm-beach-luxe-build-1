@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { RevealAnimation } from "@/components/RevealAnimation";
 import { SEO } from "@/components/SEO";
+import { formatInitials } from "@/components/AjName";
 import { BuildReadyChecklist } from "@/components/BuildReadyChecklist";
 import { ScheduleDrivenSection } from "@/components/ScheduleDrivenSection";
 
@@ -206,7 +207,7 @@ const Process = () => {
               >
                 <RevealAnimation animation="fade-up" delay={620}>
                   <p className="font-sans font-light text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl">
-                    Led by AJ Hoover, with 30 years in the construction industry,
+                    Led by {formatInitials("AJ Hoover")}, with 30 years in the construction industry,
                     distilled into a private, measured cadence — from the first quiet
                     conversation to the day we hand you the keys.
                   </p>
