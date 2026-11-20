@@ -286,11 +286,16 @@ Deno.serve(async (req) => {
     { plainText: true }
   )
 
-  // Resolve subject — supports static string or dynamic function
-  const resolvedSubject =
+  // Resolve subject — supports static string or dynamic function.
+  // Dynamic subjects include caller-supplied fields, so keep them on one line.
+  const resolvedSubject = String(
     typeof template.subject === 'function'
       ? template.subject(templateData)
       : template.subject
+  )
+    .replace(/[\p{Cc}\u2028\u2029]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 
   // 5. Enqueue the pre-rendered email for async processing by the dispatcher.
   // The dispatcher (process-email-queue) handles sending, retries, and rate-limit backoff.
