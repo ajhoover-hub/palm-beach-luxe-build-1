@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { thankYouPath } from "@/lib/adsConversions";
 import { z } from "zod";
 import oceanfront from "@/assets/projects/oceanfront.jpg.asset.json";
 import urbanClassical from "@/assets/projects/urban-classical.jpg.asset.json";
@@ -485,7 +486,7 @@ const InquiryPlate = ({ defaultStyle }: { defaultStyle?: string }) => {
     }
     setSubmitting(true);
     try {
-      const { error: notifyError } = await supabase.functions.invoke("send-transactional-email", {
+      const { data: notification, error: notifyError } = await supabase.functions.invoke("send-transactional-email", {
         body: {
           templateName: "style-book-notification",
           idempotencyKey: `style-notify-${Date.now()}-${parsed.data.email}`,
@@ -513,7 +514,7 @@ const InquiryPlate = ({ defaultStyle }: { defaultStyle?: string }) => {
       });
       if (confirmError) throw confirmError;
       styleTouched.current = false;
-      navigate("/thank-you?form=stylebook");
+      navigate(thankYouPath("stylebook", notification));
     } catch (err) {
       console.error("Style Book inquiry failed:", err);
       toast({

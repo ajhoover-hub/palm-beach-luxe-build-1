@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { RevealAnimation } from "@/components/RevealAnimation";
 import { SEO } from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
+import { thankYouPath } from "@/lib/adsConversions";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
@@ -81,7 +82,7 @@ const Contact = () => {
       };
 
       // 1. Internal notification to the office
-      const { error: notifyError } = await supabase.functions.invoke("send-transactional-email", {
+      const { data: notification, error: notifyError } = await supabase.functions.invoke("send-transactional-email", {
         body: {
           templateName: "contact-notification",
           idempotencyKey: `contact-notify-${Date.now()}-${data.email}`,
@@ -107,7 +108,7 @@ const Contact = () => {
       });
       if (confirmError) throw confirmError;
 
-      navigate("/thank-you?form=contact");
+      navigate(thankYouPath("contact", notification));
     } catch (error: any) {
       console.error("Error sending message:", error);
       toast({

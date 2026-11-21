@@ -2,6 +2,7 @@
 // Inert unless a public ID is hard-coded below or supplied as VITE_GADS_*.
 // Every event is also pushed to window.dataLayer (pb_form_submit / pb_click_to_call).
 import { pushDataLayer } from "@/lib/gtm";
+import { supabase } from "@/integrations/supabase/client";
 
 type Gtag = (...args: unknown[]) => void;
 
@@ -65,16 +66,49 @@ function sendConversion(label: string | undefined, extra: Record<string, unknown
   gtag("event", "conversion", { send_to: `${ADS_ID}/${label}`, ...extra });
 }
 
-export function trackFormConversion(form: string): void {
-  if (!isBrowser()) return;
-  const key = `pb_conv_form_${form}`;
+export type InquiryForm = "contact" | "stylebook";
+
+function isInquiryForm(value: unknown): value is InquiryForm {
+  return value === "contact" || value === "stylebook";
+}
+
+/**
+ * Thank-you URL for an inquiry the server accepted. The notification response
+ * from send-transactional-email carries the one-time conversion nonce; without
+ * it the thank-you page still renders but records no conversion.
+ */
+export function thankYouPath(form: InquiryForm, notification: unknown): string {
+  const issued = notification as { conversionNonce?: unknown; conversionForm?: unknown } | null;
+  const nonce =
+    issued && issued.conversionForm === form && typeof issued.conversionNonce === "string"
+      ? issued.conversionNonce
+      : "";
+  return nonce
+    ? `/thank-you?form=${form}&nonce=${encodeURIComponent(nonce)}`
+    : `/thank-you?form=${form}`;
+}
+
+/**
+ * Sends the form conversion only after redeem-conversion-nonce spends the
+ * nonce for this form. The URL, sessionStorage and localStorage are all
+ * visitor-controlled, so none of them is proof of a submitted inquiry.
+ */
+export async function trackRedeemedFormConversion(
+  form: string | null,
+  nonce: string | null,
+): Promise<void> {
+  if (!isBrowser() || !isInquiryForm(form) || !nonce) return;
+  let redeemed: InquiryForm;
   try {
-    if (window.sessionStorage.getItem(key)) return;
-    window.sessionStorage.setItem(key, "1");
+    const { data, error } = await supabase.functions.invoke("redeem-conversion-nonce", {
+      body: { nonce, form },
+    });
+    if (error || data?.accepted !== true || data.form !== form) return;
+    redeemed = data.form;
   } catch {
-    /* fire anyway */
+    return;
   }
-  pushDataLayer({ event: "pb_form_submit", form_name: form });
+  pushDataLayer({ event: "pb_form_submit", form_name: redeemed });
   sendConversion(FORM_LABEL);
 }
 
