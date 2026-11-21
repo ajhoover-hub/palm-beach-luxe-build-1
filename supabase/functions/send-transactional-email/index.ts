@@ -3,6 +3,12 @@ import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
+import {
+  CONVERSION_FORM_BY_TEMPLATE,
+  CONVERSION_NONCE_TTL_MS,
+  generateConversionNonce,
+  hashConversionNonce,
+} from '../_shared/ads-conversion-nonce.ts'
 
 // Configuration baked in at scaffold time — do NOT change these manually.
 // To update, re-run the email domain setup flow.
@@ -344,8 +350,30 @@ Deno.serve(async (req) => {
 
   console.log('Transactional email enqueued', { templateName, effectiveRecipient })
 
+  // 6. For an accepted contact / Style Book inquiry, issue the one-time nonce
+  // the thank-you page must redeem before it may report an ads conversion.
+  let conversion: Record<string, string> = {}
+  const conversionForm = CONVERSION_FORM_BY_TEMPLATE[templateName]
+  if (conversionForm) {
+    const conversionNonce = generateConversionNonce()
+    const expiresAt = new Date(Date.now() + CONVERSION_NONCE_TTL_MS).toISOString()
+    const { error: nonceError } = await supabase.from('ads_conversion_nonces').insert({
+      nonce_hash: await hashConversionNonce(conversionNonce),
+      form: conversionForm,
+      idempotency_key: idempotencyKey,
+      message_id: messageId,
+      expires_at: expiresAt,
+    })
+    if (nonceError) {
+      // A duplicate idempotency key lands here too: that inquiry already has its nonce.
+      console.error('Conversion nonce not issued', { error: nonceError, templateName })
+    } else {
+      conversion = { conversionNonce, conversionForm, expiresAt }
+    }
+  }
+
   return new Response(
-    JSON.stringify({ success: true, queued: true }),
+    JSON.stringify({ success: true, queued: true, ...conversion }),
     {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

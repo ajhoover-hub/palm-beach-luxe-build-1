@@ -4,7 +4,7 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { RevealAnimation } from "@/components/RevealAnimation";
 import { SEO } from "@/components/SEO";
-import { trackFormConversion } from "@/lib/adsConversions";
+import { trackRedeemedFormConversion } from "@/lib/adsConversions";
 
 const notes = [
   {
@@ -27,14 +27,15 @@ const notes = [
 const ThankYou = () => {
   const [params] = useSearchParams();
   const form = params.get("form");
+  const nonce = params.get("nonce");
   const isStyleBook = form === "stylebook";
   const opening = isStyleBook
     ? "Your Style Book selection is now with our Worth Avenue atelier."
     : "Your note is now with our Worth Avenue atelier.";
 
   useEffect(() => {
-    if (form === "contact" || form === "stylebook") trackFormConversion(form);
-  }, [form]);
+    void trackRedeemedFormConversion(form, nonce);
+  }, [form, nonce]);
 
   return (
     <>
