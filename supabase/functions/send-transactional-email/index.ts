@@ -27,12 +27,64 @@ function generateToken(): string {
 
 // Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
 // gateway validates the caller's JWT (anon or service_role) before the request
-// reaches this code. No in-function auth check is needed.
+// reaches this code. The anon key is published in the site client, so that is
+// not a per-caller identity: each caller also gets a rolling enqueue budget.
+const MAX_REQUESTS_PER_CALLER = 8
+const CALLER_WINDOW_MS = 60_000
+const PRUNE_THRESHOLD = 10_000
+const recentRequestsByCaller = new Map<string, number[]>()
+
+function callerKey(req: Request): string {
+  const firstHop = (req.headers.get('x-forwarded-for') ?? '')
+    .split(',')
+    .map((part) => part.trim())
+    .find((part) => part.length > 0)
+  return firstHop ?? 'anonymous'
+}
+
+// Check and record in one synchronous step so concurrent requests from the
+// same caller cannot all pass before any of them is counted. Returns the
+// seconds until a slot frees up when the caller is over budget, else null.
+function takeCallerSlot(caller: string): number | null {
+  const now = Date.now()
+  const windowStart = now - CALLER_WINDOW_MS
+  const recent = (recentRequestsByCaller.get(caller) ?? []).filter((t) => t > windowStart)
+
+  if (recent.length >= MAX_REQUESTS_PER_CALLER) {
+    recentRequestsByCaller.set(caller, recent)
+    return Math.max(1, Math.ceil((recent[0] + CALLER_WINDOW_MS - now) / 1000))
+  }
+
+  recent.push(now)
+  recentRequestsByCaller.set(caller, recent)
+
+  if (recentRequestsByCaller.size > PRUNE_THRESHOLD) {
+    for (const [key, times] of recentRequestsByCaller) {
+      if (times[times.length - 1] <= windowStart) recentRequestsByCaller.delete(key)
+    }
+  }
+  return null
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
+  }
+
+  const retryAfterSeconds = takeCallerSlot(callerKey(req))
+  if (retryAfterSeconds !== null) {
+    return new Response(
+      JSON.stringify({ error: 'Too many requests' }),
+      {
+        status: 429,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+          'Retry-After': String(retryAfterSeconds),
+        },
+      }
+    )
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
