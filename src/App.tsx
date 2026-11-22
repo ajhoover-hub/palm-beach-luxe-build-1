@@ -8,6 +8,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { RouteTracker } from "@/components/RouteTracker";
 import { initGTM } from "@/lib/gtm";
 import { initGoogleAdsTag, installTelClickTracking } from "@/lib/adsConversions";
+import { captureSensitiveParams } from "@/lib/sensitiveUrl";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Process from "./pages/Process";
@@ -24,6 +25,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import NotFound from "./pages/NotFound";
 
 if (!import.meta.env.SSR) {
+  captureSensitiveParams();
   initGTM();
   initGoogleAdsTag();
   installTelClickTracking();

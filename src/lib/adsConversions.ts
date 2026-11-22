@@ -2,6 +2,7 @@
 // Inert unless a public ID is hard-coded below or supplied as VITE_GADS_*.
 // Every event is also pushed to window.dataLayer (pb_form_submit / pb_click_to_call).
 import { pushDataLayer } from "@/lib/gtm";
+import { measuredPageLocation } from "@/lib/sensitiveUrl";
 
 type Gtag = (...args: unknown[]) => void;
 
@@ -57,12 +58,16 @@ export function initGoogleAdsTag(): void {
   script.src = src;
   document.head.appendChild(script);
   gtag("js", new Date());
-  gtag("config", ADS_ID);
+  gtag("config", ADS_ID, { page_location: measuredPageLocation() });
 }
 
 function sendConversion(label: string | undefined, extra: Record<string, unknown> = {}): void {
   if (!ADS_ID || !label) return;
-  gtag("event", "conversion", { send_to: `${ADS_ID}/${label}`, ...extra });
+  gtag("event", "conversion", {
+    send_to: `${ADS_ID}/${label}`,
+    page_location: measuredPageLocation(),
+    ...extra,
+  });
 }
 
 export function trackFormConversion(form: string): void {
