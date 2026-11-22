@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "npm:react@18.3.1",
+    "lib": ["deno.window", "dom"],
+    "strict": false,
+    "noImplicitAny": false
+  },
+  "imports": {
+    "npm:@supabase/supabase-js@2": "./email-queue-outage.memory.ts",
+    "npm:@supabase/supabase-js@2/cors": "./email-queue-outage.cors.ts",
+    "npm:@lovable.dev/email-js": "npm:@lovable.dev/email-js@0.8.0"
+  }
+}
