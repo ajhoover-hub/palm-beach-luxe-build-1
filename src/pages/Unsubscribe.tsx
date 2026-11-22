@@ -4,6 +4,7 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
+import { getCapturedUnsubscribeToken } from "@/lib/sensitiveUrl";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
@@ -11,9 +12,16 @@ const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 type State = "loading" | "valid" | "already" | "invalid" | "submitting" | "success" | "error";
 
 const Unsubscribe = () => {
-  const [params] = useSearchParams();
-  const token = params.get("token");
+  const [params, setParams] = useSearchParams();
+  const [token] = useState(() => getCapturedUnsubscribeToken() ?? params.get("token"));
   const [state, setState] = useState<State>("loading");
+
+  useEffect(() => {
+    if (!params.has("token")) return;
+    const rest = new URLSearchParams(params);
+    rest.delete("token");
+    setParams(rest, { replace: true });
+  }, [params, setParams]);
 
   useEffect(() => {
     if (!token) {

@@ -25,6 +25,10 @@ function generateToken(): string {
     .join('')
 }
 
+// Unused unsubscribe tokens expire after 30 days in handle-email-unsubscribe.
+// Rotate well before that so every link sent stays valid for at least 15 days.
+const TOKEN_ROTATE_AFTER_MS = 15 * 24 * 60 * 60 * 1000
+
 // Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
 // gateway validates the caller's JWT (anon or service_role) before the request
 // reaches this code. No in-function auth check is needed.
@@ -162,12 +166,11 @@ Deno.serve(async (req) => {
 
   // 3. Get or create unsubscribe token (one token per email address)
   const normalizedEmail = effectiveRecipient.toLowerCase()
-  let unsubscribeToken: string
 
   // Check for existing token for this email
   const { data: existingToken, error: tokenLookupError } = await supabase
     .from('email_unsubscribe_tokens')
-    .select('token, used_at')
+    .select('token, used_at, created_at')
     .eq('email', normalizedEmail)
     .maybeSingle()
 
@@ -192,18 +195,34 @@ Deno.serve(async (req) => {
     )
   }
 
-  if (existingToken && !existingToken.used_at) {
-    // Reuse existing unused token
-    unsubscribeToken = existingToken.token
-  } else if (!existingToken) {
-    // Create new token — upsert handles concurrent inserts gracefully
-    unsubscribeToken = generateToken()
-    const { error: tokenError } = await supabase
-      .from('email_unsubscribe_tokens')
-      .upsert(
-        { token: unsubscribeToken, email: normalizedEmail },
-        { onConflict: 'email', ignoreDuplicates: true }
-      )
+  const tokenAgeMs = existingToken ? Date.now() - Date.parse(existingToken.created_at) : NaN
+  const needsNewToken =
+    !existingToken || (!existingToken.used_at && !(tokenAgeMs < TOKEN_ROTATE_AFTER_MS))
+  let storedToken = existingToken
+
+  if (needsNewToken) {
+    let tokenError: unknown = null
+    if (!existingToken) {
+      // Create new token — upsert handles concurrent inserts gracefully
+      const { error } = await supabase
+        .from('email_unsubscribe_tokens')
+        .upsert(
+          { token: generateToken(), email: normalizedEmail },
+          { onConflict: 'email', ignoreDuplicates: true }
+        )
+      tokenError = error
+    } else {
+      // Replace a stale unused token so the link in this email stays valid
+      // for a while after sending. Matching the old token and used_at keeps a
+      // concurrent rotation or redemption from being overwritten.
+      const { error } = await supabase
+        .from('email_unsubscribe_tokens')
+        .update({ token: generateToken(), created_at: new Date().toISOString() })
+        .eq('email', normalizedEmail)
+        .eq('token', existingToken.token)
+        .is('used_at', null)
+      tokenError = error
+    }
 
     if (tokenError) {
       console.error('Failed to create unsubscribe token', {
@@ -225,15 +244,15 @@ Deno.serve(async (req) => {
       )
     }
 
-    // If another request raced us, our upsert was silently ignored.
+    // If another request raced us, our write was silently skipped.
     // Re-read to get the actual stored token.
-    const { data: storedToken, error: reReadError } = await supabase
+    const { data: reReadToken, error: reReadError } = await supabase
       .from('email_unsubscribe_tokens')
-      .select('token')
+      .select('token, used_at, created_at')
       .eq('email', normalizedEmail)
       .maybeSingle()
 
-    if (reReadError || !storedToken) {
+    if (reReadError || !reReadToken) {
       console.error('Failed to read back unsubscribe token after upsert', {
         error: reReadError,
         email: normalizedEmail,
@@ -253,8 +272,10 @@ Deno.serve(async (req) => {
         }
       )
     }
-    unsubscribeToken = storedToken.token
-  } else {
+    storedToken = reReadToken
+  }
+
+  if (!storedToken || storedToken.used_at) {
     // Token exists but is already used — email should have been caught by suppression check above.
     // This is a safety fallback; log and skip sending.
     console.warn('Unsubscribe token already used but email not suppressed', {
@@ -276,6 +297,7 @@ Deno.serve(async (req) => {
       }
     )
   }
+  const unsubscribeToken = storedToken.token
 
   // 4. Render React Email template to HTML and plain text
   const html = await renderAsync(
