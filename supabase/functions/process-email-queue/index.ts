@@ -113,18 +113,13 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-  // 1. Check rate-limit cooldown and read queue config
+  // 1. Read queue config. There is deliberately no run-wide rate-limit
+  // cooldown: anyone can enqueue transactional mail, so a 429 on one message
+  // must not pause delivery of every other message on either queue.
   const { data: state } = await supabase
     .from('email_send_state')
-    .select('retry_after_until, batch_size, send_delay_ms, auth_email_ttl_minutes, transactional_email_ttl_minutes')
+    .select('batch_size, send_delay_ms, auth_email_ttl_minutes, transactional_email_ttl_minutes')
     .single()
-
-  if (state?.retry_after_until && new Date(state.retry_after_until) > new Date()) {
-    return new Response(
-      JSON.stringify({ skipped: true, reason: 'rate_limited' }),
-      { headers: { 'Content-Type': 'application/json' } }
-    )
-  }
 
   const batchSize = state?.batch_size ?? DEFAULT_BATCH_SIZE
   const sendDelayMs = state?.send_delay_ms ?? DEFAULT_SEND_DELAY_MS
@@ -134,6 +129,7 @@ Deno.serve(async (req) => {
   }
 
   let totalProcessed = 0
+  let totalRateLimited = 0
 
   // 2. Process auth_emails first (priority), then transactional_emails
   for (const queue of ['auth_emails', 'transactional_emails']) {
@@ -151,8 +147,8 @@ Deno.serve(async (req) => {
     if (!messages?.length) continue
 
     // Retry budget is based on real send failures, not pgmq read_ct.
-    // read_ct increments for every message in a claimed batch, including
-    // messages not attempted when a 429 stops processing early.
+    // read_ct increments for every claimed message, including ones the
+    // provider rate-limited, which are not failed attempts.
     const messageIds = Array.from(
       new Set(
         messages
@@ -305,48 +301,38 @@ Deno.serve(async (req) => {
             status: 'rate_limited',
             error_message: errorMsg.slice(0, 1000),
           })
+          console.warn('Email rate-limited; deferring this message only', {
+            queue,
+            msg_id: msg.msg_id,
+            retry_after_seconds: getRetryAfterSeconds(error),
+          })
+          totalRateLimited++
 
-          const retryAfterSecs = getRetryAfterSeconds(error)
-          await supabase
-            .from('email_send_state')
-            .update({
-              retry_after_until: new Date(
-                Date.now() + retryAfterSecs * 1000
-              ).toISOString(),
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', 1)
-
-          // Stop processing — remaining messages stay in queue (VT expires, retried next cycle)
-          return new Response(
-            JSON.stringify({ processed: totalProcessed, stopped: 'rate_limited' }),
-            { headers: { 'Content-Type': 'application/json' } }
-          )
-        }
-
-        // 403s are permanent configuration or authorization failures for this
-        // message, so move straight to DLQ and stop processing the rest of the batch.
-        if (isForbidden(error)) {
+          // Only this message waits: it stays invisible until its VT expires and
+          // is retried on a later run. Keep delivering the rest of the batch.
+        } else if (isForbidden(error)) {
+          // 403s are permanent configuration or authorization failures for this
+          // message, so move straight to DLQ and stop processing the rest of the batch.
           await moveToDlq(supabase, queue, msg, errorMsg.slice(0, 1000))
           return new Response(
             JSON.stringify({ processed: totalProcessed, stopped: 'forbidden' }),
             { headers: { 'Content-Type': 'application/json' } }
           )
-        }
+        } else {
+          // Log non-429 failures to track real retry attempts.
+          await supabase.from('email_send_log').insert({
+            message_id: payload.message_id,
+            template_name: payload.label || queue,
+            recipient_email: payload.to,
+            status: 'failed',
+            error_message: errorMsg.slice(0, 1000),
+          })
+          if (payload?.message_id && typeof payload.message_id === 'string') {
+            failedAttemptsByMessageId.set(payload.message_id, failedAttempts + 1)
+          }
 
-        // Log non-429 failures to track real retry attempts.
-        await supabase.from('email_send_log').insert({
-          message_id: payload.message_id,
-          template_name: payload.label || queue,
-          recipient_email: payload.to,
-          status: 'failed',
-          error_message: errorMsg.slice(0, 1000),
-        })
-        if (payload?.message_id && typeof payload.message_id === 'string') {
-          failedAttemptsByMessageId.set(payload.message_id, failedAttempts + 1)
+          // Non-429 errors: message stays invisible until VT expires, then retried
         }
-
-        // Non-429 errors: message stays invisible until VT expires, then retried
       }
 
       // Small delay between sends to smooth bursts
@@ -357,7 +343,7 @@ Deno.serve(async (req) => {
   }
 
   return new Response(
-    JSON.stringify({ processed: totalProcessed }),
+    JSON.stringify({ processed: totalProcessed, rate_limited: totalRateLimited }),
     { headers: { 'Content-Type': 'application/json' } }
   )
 })
