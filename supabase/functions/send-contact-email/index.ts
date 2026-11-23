@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { timingSafeEqual } from "https://deno.land/std@0.190.0/crypto/timing_safe_equal.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -8,6 +10,19 @@ const corsHeaders = {
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
+
+const OFFICE_EMAIL = "aj@bmbpalmbeach.com";
+const MAX_BODY_BYTES = 16 * 1024;
+const MAX_MESSAGE_CHARS = 8192;
+const MAX_FIELD_CHARS = 256;
+const MAX_EMAIL_CHARS = 254;
+
+// Per-isolate limits. The service-role check is the primary gate; these bound
+// how much one caller (or a leaked key) can send before an operator notices.
+const SOURCE_LIMIT = { max: 1, windowMs: 10 * 60_000 };
+const RECIPIENT_LIMIT = { max: 1, windowMs: 60 * 60_000 };
+const GLOBAL_LIMIT = { max: 20, windowMs: 60 * 60_000 };
+const MAX_TRACKED_KEYS = 10_000;
 
 interface ContactEmailRequest {
   firstName: string;
@@ -23,13 +38,166 @@ interface ContactEmailRequest {
   investmentRange?: string;
 }
 
+const OPTIONAL_FIELDS = [
+  "lastName",
+  "phone",
+  "message",
+  "style",
+  "source",
+  "projectType",
+  "timeline",
+  "ownsLot",
+  "investmentRange",
+] as const;
+
+const jsonResponse = (status: number, body: unknown): Response =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json", ...corsHeaders },
+  });
+
+const encoder = new TextEncoder();
+
+function isServiceRoleCaller(req: Request, serviceRoleKey: string): boolean {
+  const header = req.headers.get("Authorization") ?? "";
+  if (!header.startsWith("Bearer ")) return false;
+  const token = header.slice("Bearer ".length).trim();
+  if (!token) return false;
+  return timingSafeEqual(encoder.encode(token), encoder.encode(serviceRoleKey));
+}
+
+async function readBodyWithin(req: Request, maxBytes: number): Promise<string | null> {
+  const declared = Number(req.headers.get("content-length") ?? "");
+  if (Number.isFinite(declared) && declared > maxBytes) return null;
+  if (!req.body) return "";
+
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > maxBytes) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(bytes);
+}
+
+function parseSubmission(raw: unknown): ContactEmailRequest | { error: string; status: number } {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    return { error: "Invalid request body", status: 400 };
+  }
+  const body = raw as Record<string, unknown>;
+  const { firstName, email } = body;
+  if (typeof firstName !== "string" || typeof email !== "string") {
+    return { error: "Missing required fields", status: 400 };
+  }
+  if (firstName.length > MAX_FIELD_CHARS || email.length > MAX_EMAIL_CHARS) {
+    return { error: "Field too long", status: 413 };
+  }
+  const submission: ContactEmailRequest = { firstName, email: email.trim() };
+  for (const field of OPTIONAL_FIELDS) {
+    const value = body[field];
+    if (value === undefined || value === null) continue;
+    if (typeof value !== "string") {
+      return { error: `Invalid field: ${field}`, status: 400 };
+    }
+    const limit = field === "message" ? MAX_MESSAGE_CHARS : MAX_FIELD_CHARS;
+    if (value.length > limit) {
+      return { error: `Field too long: ${field}`, status: 413 };
+    }
+    submission[field] = value;
+  }
+  if (!/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(submission.email)) {
+    return { error: "Invalid email", status: 400 };
+  }
+  return submission;
+}
+
+const rateWindows = new Map<string, { count: number; resetAt: number }>();
+
+function pruneRateWindows(now: number) {
+  for (const [key, window] of rateWindows) {
+    if (window.resetAt <= now) rateWindows.delete(key);
+  }
+}
+
+// Checks and consumes every limit in one synchronous step so concurrent
+// requests cannot all observe the same free slot.
+function tryReserve(limits: { key: string; max: number; windowMs: number }[]): boolean {
+  const now = Date.now();
+  if (rateWindows.size > MAX_TRACKED_KEYS) pruneRateWindows(now);
+  if (rateWindows.size > MAX_TRACKED_KEYS) return false;
+
+  for (const { key, max } of limits) {
+    const window = rateWindows.get(key);
+    if (window && window.resetAt > now && window.count >= max) return false;
+  }
+  for (const { key, windowMs } of limits) {
+    const window = rateWindows.get(key);
+    if (window && window.resetAt > now) {
+      window.count += 1;
+    } else {
+      rateWindows.set(key, { count: 1, resetAt: now + windowMs });
+    }
+  }
+  return true;
+}
+
+function sourceOf(req: Request): string {
+  const forwarded = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  return forwarded || req.headers.get("x-real-ip")?.trim() || "unknown";
+}
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  if (req.method !== "POST") {
+    return jsonResponse(405, { error: "Method not allowed" });
+  }
+
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  if (!serviceRoleKey || !supabaseUrl) {
+    console.error("send-contact-email is missing SUPABASE_SERVICE_ROLE_KEY or SUPABASE_URL");
+    return jsonResponse(500, { error: "Server configuration error" });
+  }
+
+  if (!isServiceRoleCaller(req, serviceRoleKey)) {
+    return jsonResponse(401, { error: "Unauthorized" });
+  }
+
   try {
+    const rawBody = await readBodyWithin(req, MAX_BODY_BYTES);
+    if (rawBody === null) {
+      return jsonResponse(413, { error: "Request body too large" });
+    }
+
+    let parsedBody: unknown;
+    try {
+      parsedBody = JSON.parse(rawBody);
+    } catch {
+      return jsonResponse(400, { error: "Invalid JSON in request body" });
+    }
+
+    const parsed = parseSubmission(parsedBody);
+    if ("error" in parsed) {
+      return jsonResponse(parsed.status, { error: parsed.error });
+    }
+
     const {
       firstName,
       lastName = "",
@@ -42,19 +210,34 @@ const handler = async (req: Request): Promise<Response> => {
       timeline,
       ownsLot,
       investmentRange,
-    }: ContactEmailRequest = await req.json();
+    } = parsed;
 
     // Validate required fields. Style Book inquiries don't require lastName or message.
     const isStyleBook = source === "style-book";
     if (!firstName || !email || (!isStyleBook && (!lastName || !message))) {
-      return new Response(
-        JSON.stringify({ error: "Missing required fields" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
+      return jsonResponse(400, { error: "Missing required fields" });
     }
+
+    const normalizedEmail = email.toLowerCase();
+    const reserved = tryReserve([
+      { key: "global", ...GLOBAL_LIMIT },
+      { key: `source:${sourceOf(req)}`, ...SOURCE_LIMIT },
+      { key: `recipient:${normalizedEmail}`, ...RECIPIENT_LIMIT },
+    ]);
+    if (!reserved) {
+      return jsonResponse(429, { error: "Too many requests" });
+    }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
+    const { data: suppressed, error: suppressionError } = await supabase
+      .from("suppressed_emails")
+      .select("id")
+      .eq("email", normalizedEmail)
+      .maybeSingle();
+    if (suppressionError) {
+      console.error("Suppression check failed; the confirmation will not be sent", suppressionError);
+    }
+    const sendConfirmation = !suppressionError && !suppressed;
 
     const fullName = `${firstName}${lastName ? " " + lastName : ""}`.trim();
     const investmentDisplay = !isStyleBook
@@ -65,7 +248,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send notification email to the team
     const teamEmailResponse = await resend.emails.send({
       from: "Beau Monde Builders <onboarding@resend.dev>",
-      to: ["aj@bmbpalmbeach.com"],
+      to: [OFFICE_EMAIL],
       subject: isStyleBook
         ? `Style Book Inquiry — ${style ?? "Unspecified"} — ${fullName}`
         : `New Contact Form Submission from ${fullName}`,
@@ -103,6 +286,11 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     console.log("Team notification email sent:", teamEmailResponse);
+
+    if (!sendConfirmation) {
+      console.log("Confirmation skipped: address is suppressed or could not be checked");
+      return jsonResponse(200, { success: true, confirmationSent: false });
+    }
 
     // Send confirmation email to the user
     const userEmailResponse = await resend.emails.send({
