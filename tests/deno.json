@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+  },
+  "imports": {
+    "@/integrations/supabase/client": "./supabase-client-stub.ts",
+    "@/components/Navigation": "./empty-component.tsx",
+    "@/components/Footer": "./empty-component.tsx",
+    "@/components/SEO": "./empty-component.tsx",
+    "@/components/ui/select": "./select-stub.tsx",
+    "@/": "../src/",
+    "react": "npm:react@18.3.1",
+    "react/jsx-runtime": "npm:react@18.3.1/jsx-runtime",
+    "react-dom": "npm:react-dom@18.3.1",
+    "react-dom/client": "npm:react-dom@18.3.1/client",
+    "react-router-dom": "npm:react-router-dom@6.30.1",
+    "react-helmet-async": "./helmet-stub.tsx",
+    "zod": "npm:zod@3.25.76",
+    "lucide-react": "npm:lucide-react@0.462.0",
+    "framer-motion": "npm:framer-motion@12.40.0",
+    "react-pageflip": "npm:react-pageflip@2.0.3",
+    "@/assets/projects/oceanfront.jpg.asset.json": "./asset-stubs/assets_projects_oceanfront.jpg.asset.ts",
+    "@/assets/projects/urban-classical.jpg.asset.json": "./asset-stubs/assets_projects_urban-classical.jpg.asset.ts",
+    "@/assets/projects/waterfront-contemporary.jpg.asset.json": "./asset-stubs/assets_projects_waterfront-contemporary.jpg.asset.ts",
+    "@/assets/projects/mediterranean.jpg.asset.json": "./asset-stubs/assets_projects_mediterranean.jpg.asset.ts",
+    "@/assets/projects/modern-coastal.jpg.asset.json": "./asset-stubs/assets_projects_modern-coastal.jpg.asset.ts",
+    "@/assets/projects/traditional-estate.jpg.asset.json": "./asset-stubs/assets_projects_traditional-estate.jpg.asset.ts",
+    "@/assets/projects/bermuda-colonial.jpg.asset.json": "./asset-stubs/assets_projects_bermuda-colonial.jpg.asset.ts",
+    "@/assets/projects/anglo-caribbean.jpg.asset.json": "./asset-stubs/assets_projects_anglo-caribbean.jpg.asset.ts",
+    "@/assets/projects/transitional.jpg.asset.json": "./asset-stubs/assets_projects_transitional.jpg.asset.ts",
+    "@/assets/projects/regency-georgian.jpg.asset.json": "./asset-stubs/assets_projects_regency-georgian.jpg.asset.ts",
+    "class-variance-authority": "npm:class-variance-authority@0.7.1",
+    "@radix-ui/react-slot": "npm:@radix-ui/react-slot@1.2.3",
+    "@radix-ui/react-label": "npm:@radix-ui/react-label@2.1.7",
+    "@radix-ui/react-select": "npm:@radix-ui/react-select@2.2.5",
+    "clsx": "npm:clsx@2.1.1",
+    "tailwind-merge": "npm:tailwind-merge@2.6.0"
+  }
+}
